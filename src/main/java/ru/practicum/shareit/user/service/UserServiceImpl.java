@@ -15,19 +15,17 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
     private final Map<Long, User> users;
     private final UserMapper mapper;
-
+    private long maxId = 0;
     @Override
     public UserDto create(UserDto userDto) {
         if(userDto.getEmail() == null) {
             throw new BadRequestException("У пользователя нет почты");
         }
-
-        checker(userDto);
-        long id = generateNextId();
-        userDto.setId(id);
+        checkerCreate(userDto);
+        userDto.setId(++maxId);
         try {
             User user = mapper.fromDto(userDto);
-            users.put(id, user);
+            users.put(maxId, user);
             return userDto;
         } catch (BadRequestException e) {
             throw new BadRequestException("Проблема при создании пользователя");
@@ -36,12 +34,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto, Long id) {
-        checker(userDto);
         userDto.setId(id);
         if (users.containsKey(id)) {
             User existingUser = users.get(id);
             UserDto updatedUserDto = mapper.fromUser(existingUser);
-
+            checkerUpdate(userDto);
             if (userDto.getName() != null) {
                 updatedUserDto.setName(userDto.getName());
             }
@@ -82,14 +79,21 @@ public class UserServiceImpl implements UserService {
         users.remove(userId);
     }
 
-    private long generateNextId() {
-        long maxId = users.keySet().stream().mapToLong(Long::valueOf).max().orElse(0L);
-        return maxId + 1;
-    }
-
-    private void checker(UserDto userDto) throws BadRequestException {
-        if(userDto.getEmail() != null) {
+    private void checkerCreate(UserDto userDto) throws BadRequestException {
             boolean isEmailUnique = users.values().stream().noneMatch(user -> user.getEmail().equals(userDto.getEmail()));
+
+            if (!userDto.getEmail().contains("@")) {
+                throw new BadRequestException("Некорректный email");
+            }
+            if (!isEmailUnique) {
+                throw new ValidationException("Email уже существует");
+            }
+    }
+    private void checkerUpdate(UserDto userDto) throws BadRequestException {
+        if (userDto.getEmail() != null) {
+            boolean isEmailUnique = users.values().stream()
+                    .filter(u -> !u.getId().equals(userDto.getId())) // исключаем из поиска текущего пользователя
+                    .noneMatch(u -> u.getEmail().equals(userDto.getEmail()));
 
             if (!userDto.getEmail().contains("@")) {
                 throw new BadRequestException("Некорректный email");
