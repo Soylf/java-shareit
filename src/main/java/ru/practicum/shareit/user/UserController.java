@@ -17,6 +17,7 @@ import java.util.Optional;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+
     @PostMapping
     public UserDto create(@RequestBody UserDto userDto) {
         log.info("запуска метода create_User с такими вот данными: \n" + userDto);
