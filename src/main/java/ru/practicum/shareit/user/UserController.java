@@ -16,8 +16,6 @@ import java.util.Optional;
 @RequestMapping(path = "/users")
 public class UserController {
     private final UserService userService;
-
-
     @PostMapping
     public UserDto create(@RequestBody UserDto userDto) {
         return userService.create(userDto);

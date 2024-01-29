@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NonNull;
+
 
 /**
  * TODO Sprint add-controllers.
@@ -10,10 +12,12 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
+@NonNull
 public class ItemDto {
-    private Integer id;
+    private Long id;
+    private Long userId;
     private String name;
     private String description;
-    private boolean available;
+    private Boolean available;
     private Integer numTimes;
 }

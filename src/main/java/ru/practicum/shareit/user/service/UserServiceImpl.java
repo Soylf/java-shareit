@@ -8,7 +8,10 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +21,7 @@ public class UserServiceImpl implements UserService {
     private long maxId = 0;
     @Override
     public UserDto create(UserDto userDto) {
-        if(userDto.getEmail() == null) {
+        if (userDto.getEmail() == null) {
             throw new BadRequestException("У пользователя нет почты");
         }
         checkerCreate(userDto);
@@ -79,20 +82,21 @@ public class UserServiceImpl implements UserService {
         users.remove(userId);
     }
 
+    //Дополнительные методы
     private void checkerCreate(UserDto userDto) throws BadRequestException {
-            boolean isEmailUnique = users.values().stream().noneMatch(user -> user.getEmail().equals(userDto.getEmail()));
+        boolean isEmailUnique = users.values().stream().noneMatch(user -> user.getEmail().equals(userDto.getEmail()));
 
-            if (!userDto.getEmail().contains("@")) {
-                throw new BadRequestException("Некорректный email");
-            }
-            if (!isEmailUnique) {
-                throw new ValidationException("Email уже существует");
-            }
+        if (!userDto.getEmail().contains("@")) {
+            throw new BadRequestException("Некорректный email");
+        }
+        if (!isEmailUnique) {
+            throw new ValidationException("Email уже существует");
+        }
     }
+
     private void checkerUpdate(UserDto userDto) throws BadRequestException {
         if (userDto.getEmail() != null) {
-            boolean isEmailUnique = users.values().stream()
-                    .filter(u -> !u.getId().equals(userDto.getId())) // исключаем из поиска текущего пользователя
+            boolean isEmailUnique = users.values().stream().filter(u -> !u.getId().equals(userDto.getId())) // исключаем из поиска текущего пользователя
                     .noneMatch(u -> u.getEmail().equals(userDto.getEmail()));
 
             if (!userDto.getEmail().contains("@")) {
