@@ -19,6 +19,7 @@ public class UserServiceImpl implements UserService {
     private final Map<Long, User> users;
     private final UserMapper mapper;
     private long maxId = 0;
+
     @Override
     public UserDto create(UserDto userDto) {
         if (userDto.getEmail() == null) {

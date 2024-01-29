@@ -16,7 +16,7 @@ public class UserMapper {
         );
     }
 
-    public UserDto fromUser(User user){
+    public UserDto fromUser(User user) {
         return new UserDto(
                 user.getId(),
                 user.getName(),
