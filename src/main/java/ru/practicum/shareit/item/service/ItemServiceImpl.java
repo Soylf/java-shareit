@@ -83,10 +83,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Optional<ItemDto> getItem(Long itemId) {
-        if (items.containsKey(itemId)) {
-            return Optional.of(mapper.fromItem(items.get(itemId)));
-        }
-        return Optional.empty();
+        Item item = items.get(itemId);
+        return Optional.ofNullable(mapper.fromItem(item));
     }
 
     @Override

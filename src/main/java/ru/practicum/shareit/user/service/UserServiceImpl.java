@@ -60,8 +60,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDto> getUser(Long id) {
-        if (users.containsKey(id)) {
-            UserDto userDto = mapper.fromUser(users.get(id));
+        User user = users.get(id);
+        if (user != null) {
+            UserDto userDto = mapper.fromUser(user);
             return Optional.of(userDto);
         } else {
             return Optional.empty();

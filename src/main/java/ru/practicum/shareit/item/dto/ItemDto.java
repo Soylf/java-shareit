@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 
 /**
  * TODO Sprint add-controllers.
@@ -15,9 +18,19 @@ import lombok.NonNull;
 @NonNull
 public class ItemDto {
     private Long id;
+
+    @NotNull(message = "userId не может быть пустым")
     private Long userId;
+
+    @NotEmpty(message = "Неверное название")
+    @NotNull(message = "name не может быть пустым")
     private String name;
+
+    @NotEmpty(message = "Неверное описание")
+    @NotNull(message = "description не может быть пустым")
     private String description;
+
+    @NotNull(message = "available не может быть пустым")
     private Boolean available;
     private Integer numTimes;
 }

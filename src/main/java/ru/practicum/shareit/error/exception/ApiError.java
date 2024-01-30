@@ -22,4 +22,7 @@ public class ApiError {
         this.message = message;
         this.debugMessage = debugMessage;
     }
+
+    public ApiError(String message) {
+    }
 }

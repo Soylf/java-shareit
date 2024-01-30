@@ -31,9 +31,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public Optional<UserDto> getUser(@PathVariable("id") Long id) {
+    public UserDto getUser(@PathVariable("id") Long id) {
         log.info("Запуск getUser");
-        return userService.getUser(id);
+        return userService.getUser(id).orElse(null);
     }
 
     @GetMapping

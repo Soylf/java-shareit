@@ -31,8 +31,8 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public Optional<ItemDto> getItem(@PathVariable("itemId") Long itemId) {
-        return itemService.getItem(itemId);
+    public ItemDto getItem(@PathVariable("itemId") Long itemId) {
+        return itemService.getItem(itemId).orElse(null);
     }
 
     @GetMapping
