@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 
@@ -22,12 +22,10 @@ public class ItemDto {
     @NotNull(message = "userId не может быть пустым")
     private Long userId;
 
-    @NotEmpty(message = "Неверное название")
-    @NotNull(message = "name не может быть пустым")
+    @NotBlank(message = "Неверное название")
     private String name;
 
-    @NotEmpty(message = "Неверное описание")
-    @NotNull(message = "description не может быть пустым")
+    @NotBlank(message = "Неверное описание")
     private String description;
 
     @NotNull(message = "available не может быть пустым")

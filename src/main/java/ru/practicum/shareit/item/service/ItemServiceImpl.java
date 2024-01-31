@@ -44,6 +44,7 @@ public class ItemServiceImpl implements ItemService {
     @SneakyThrows
     public ItemDto updateItem(ItemDto itemDto, Long itemId, Long userId) {
         checkUser(userId);
+        ItemDto updatedItemDto = mapper.fromItem(items.get(itemId));
 
         if (!itemUsers.containsKey(userId)) {
             throw new EntityNotFoundException("Пользователь с ID " + userId + " не имеет никаких товаров");
@@ -55,8 +56,7 @@ public class ItemServiceImpl implements ItemService {
             }
         }
 
-        if (items.containsKey(itemId)) {
-            ItemDto updatedItemDto = mapper.fromItem(items.get(itemId));
+        if (updatedItemDto != null) {
             if (itemDto.getDescription() != null) {
                 updatedItemDto.setDescription(itemDto.getDescription());
             }

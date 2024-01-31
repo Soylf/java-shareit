@@ -39,8 +39,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(UserDto userDto, Long id) {
         userDto.setId(id);
-        if (users.containsKey(id)) {
-            User existingUser = users.get(id);
+        User existingUser = users.get(id);
+        if (existingUser != null) {
             UserDto updatedUserDto = mapper.fromUser(existingUser);
             checkerUpdate(userDto);
             if (userDto.getName() != null) {
