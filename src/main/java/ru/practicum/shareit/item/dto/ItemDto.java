@@ -18,16 +18,12 @@ import javax.validation.constraints.NotNull;
 @NonNull
 public class ItemDto {
     private Long id;
-
     @NotNull(message = "userId не может быть пустым")
     private Long userId;
-
     @NotBlank(message = "Неверное название")
     private String name;
-
     @NotBlank(message = "Неверное описание")
     private String description;
-
     @NotNull(message = "available не может быть пустым")
     private Boolean available;
     private Integer numTimes;

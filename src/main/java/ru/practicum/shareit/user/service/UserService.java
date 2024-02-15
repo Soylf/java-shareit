@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import ru.practicum.shareit.user.dto.UserDto;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
