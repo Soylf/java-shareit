@@ -15,36 +15,36 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
-    private final UserService userService;
+    private final UserService service;
 
     @PostMapping
     public UserDto create(@RequestBody UserDto userDto) {
         log.info("запуска метода create_User с такими вот данными: \n" + userDto);
-        return userService.create(userDto);
+        return service.create(userDto);
     }
 
     @PatchMapping("/{userId}")
     public UserDto update(@RequestBody UserDto userDto, @PathVariable("userId") Long id) {
         log.info("Запуск метода updateUser вот с такими данными: \n" + userDto);
-        return userService.update(userDto, id);
+        return service.update(userDto, id);
     }
 
     @GetMapping("/{id}")
     public UserDto getUser(@PathVariable("id") Long id) {
         log.info("Запуск getUser");
-        return userService.getUser(id).orElse(null);
+        return service.getUser(id).orElse(null);
     }
 
     @GetMapping
     public List<UserDto> getAllUsers() {
         log.info("Запуск getAllUser");
-        return userService.getAllUsers();
+        return service.getAllUsers();
     }
 
     @DeleteMapping("/{id}")
     public boolean deleteUserById(@PathVariable("id") Long id) {
         log.info("Запуск deleteUser");
-        userService.deleteUserById(id);
+        service.deleteUserById(id);
         return true;
     }
 }

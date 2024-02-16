@@ -14,33 +14,33 @@ import java.util.List;
 @RequestMapping("/items")
 @AllArgsConstructor
 public class ItemController {
-    private final ItemService itemService;
+    private final ItemService service;
 
     @PostMapping
     public ItemDto addItem(@RequestBody ItemDto itemDto,
                            @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.addItem(itemDto, userId);
+        return service.addItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto update(@RequestBody ItemDto itemDto,
                           @PathVariable("itemId") Long itemId,
                           @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.updateItem(itemDto, itemId, userId);
+        return service.updateItem(itemDto, itemId, userId);
     }
 
     @GetMapping("/{itemId}")
     public ItemDto getItem(@PathVariable("itemId") Long itemId) {
-        return itemService.getItem(itemId).orElse(null);
+        return service.getItem(itemId).orElse(null);
     }
 
     @GetMapping
     public List<ItemDto> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.getAllItem(userId);
+        return service.getAllItem(userId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItem(@RequestParam("text") String text) {
-        return itemService.searchItem(text);
+        return service.searchItem(text);
     }
 }

@@ -28,9 +28,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDto update(UserDto userDto, Long id) {
-        userRepository.updateUserFields(mapper.fromDto(userDto), id);
-        return mapper.fromUser(userRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Пользователь с ID " + id + " не существует")));
+        userRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Пользователь с ID " + id + " не существует"));
+
+        return mapper.fromUser(userRepository.save(mapper.fromDto(userDto)));
     }
 
     @Transactional

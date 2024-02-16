@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -18,38 +19,37 @@ import java.util.Optional;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final ItemMapper mapper;
+    private final ItemMapper itemMapper;
+    private final CommentMapper commentMapper;
 
     @Override
     public ItemDto addItem(ItemDto itemDto, Long userId) {
         checkUser(userId);
 
-        Item item = mapper.fromDto(itemDto);
+        Item item = itemMapper.fromDto(itemDto);
         item.setUserId(userId);
-        return mapper.fromItem(item);
+        return itemMapper.fromItem(item);
     }
 
     @Override
     public ItemDto updateItem(ItemDto itemDto, Long itemId, Long userId) {
         checkItem(itemId);
         checkUser(userId);
-
-        itemRepository.updateItemFields(mapper.fromDto(itemDto), itemId, userId);
-        return mapper.fromItem(itemRepository.findById(itemId)
-                .orElseThrow(() -> new BadRequestException("Придмета с ID " + itemDto + " не существует")));
+        Item item = itemRepository.save(itemMapper.fromDto(itemDto));
+        return itemMapper.fromItem(item);
     }
 
     @Override
     public Optional<ItemDto> getItem(Long itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new BadRequestException("Придмета с ID " + itemId + " не существует"));
-        return Optional.of(mapper.fromItem(item));
+        return Optional.of(itemMapper.fromItem(item));
     }
 
     @Override
     public List<ItemDto> getAllItem(Long userId) {
         List<Item> items = itemRepository.findAll();
-        return mapper.toItemDto(items);
+        return itemMapper.toItemDto(items);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ItemServiceImpl implements ItemService {
         if (!text.isBlank()) {
             for (Item item : itemRepository.findAll()) {
                 if (itemContains(item, text) && item.getAvailable()) {
-                    foundItems.add(mapper.fromItem(item));
+                    foundItems.add(itemMapper.fromItem(item));
                 }
             }
         }

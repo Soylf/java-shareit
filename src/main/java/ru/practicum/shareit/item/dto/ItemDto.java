@@ -15,7 +15,6 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @Builder
-@NonNull
 public class ItemDto {
     private Long id;
     @NotNull(message = "userId не может быть пустым")
