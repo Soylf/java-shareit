@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.server;
 
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.error.exception.EntityNotFoundException;
 
 import java.util.List;
 
@@ -13,7 +15,7 @@ public interface BookingService {
 
     BookingDto getBooking(long userId, Long bookingId);
 
-    List<BookingDto> getUserBookings(long userId, String state);
+    List<BookingDto> getUserBookings(long userId, BookingStatus state);
 
-    List<BookingDto> getOwnerItemsBooked(long userId, String state);
+    List<BookingDto> getUserItemsBooked(long userId, BookingStatus state) throws EntityNotFoundException;
 }

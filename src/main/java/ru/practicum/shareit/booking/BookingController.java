@@ -3,7 +3,9 @@ package ru.practicum.shareit.booking;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.server.BookingService;
+import ru.practicum.shareit.error.exception.EntityNotFoundException;
 
 import java.util.List;
 
@@ -36,13 +38,13 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getUserBookings(@RequestHeader("X-Sharer-User-Id") long userId,
-                                            @RequestParam(required = false, defaultValue = "ALL") String state) {
+                                            @RequestParam(required = false, defaultValue = "ALL") BookingStatus state) {
         return service.getUserBookings(userId,state);
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getOwnerItemsBooked(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                @RequestParam(required = false, defaultValue = "ALL") String state) {
-        return service.getOwnerItemsBooked(userId,state);
+    public List<BookingDto> getUserItemsBooked(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                @RequestParam(required = false, defaultValue = "ALL") BookingStatus state) throws EntityNotFoundException {
+        return service.getUserItemsBooked(userId,state);
     }
 }

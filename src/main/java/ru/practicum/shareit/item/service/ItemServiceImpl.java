@@ -2,9 +2,9 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -19,15 +19,16 @@ import java.util.Optional;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
     private final ItemMapper itemMapper;
-    private final CommentMapper commentMapper;
+
 
     @Override
     public ItemDto addItem(ItemDto itemDto, Long userId) {
         checkUser(userId);
 
         Item item = itemMapper.fromDto(itemDto);
-        item.setUserId(userId);
+        item.setOwnerId(userId);
         return itemMapper.fromItem(item);
     }
 
@@ -42,13 +43,24 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Optional<ItemDto> getItem(Long itemId) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new BadRequestException("Придмета с ID " + itemId + " не существует"));
+                .orElseThrow(() -> new BadRequestException("Предмета с ID " + itemId + " не существует"));
+
+
+        item.setLastBookingDate(bookingRepository.getLastBookingDateForItem(itemId));
+        item.setNextBookingDate(bookingRepository.getNextBookingDateForItem(itemId));
+
         return Optional.of(itemMapper.fromItem(item));
     }
 
     @Override
     public List<ItemDto> getAllItem(Long userId) {
         List<Item> items = itemRepository.findAll();
+
+        for (Item item : items) {
+            item.setLastBookingDate(bookingRepository.getLastBookingDateForItem(item.getId()));
+            item.setNextBookingDate(bookingRepository.getNextBookingDateForItem(item.getId()));
+        }
+
         return itemMapper.toItemDto(items);
     }
 
@@ -71,6 +83,7 @@ public class ItemServiceImpl implements ItemService {
     private boolean itemContains(Item item, String text) {
         return item.getName().toLowerCase().contains(text.toLowerCase()) || item.getDescription().toLowerCase().contains(text.toLowerCase());
     }
+
     private void checkUser(long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException("пользователя: " + userId + "  нет"));

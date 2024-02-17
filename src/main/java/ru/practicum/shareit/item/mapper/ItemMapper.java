@@ -15,20 +15,24 @@ public class ItemMapper {
     public Item fromDto(ItemDto itemDto) {
         return Item.builder()
                 .id(itemDto.getId())
-                .userId(itemDto.getUserId())
+                .ownerId(itemDto.getOwnerId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
+                .lastBookingDate(itemDto.getLastBookingDate())
+                .nextBookingDate(itemDto.getNextBookingDate())
                 .build();
     }
 
     public ItemDto fromItem(Item item) {
         return ItemDto.builder()
                 .id(item.getId())
-                .userId(item.getUserId())
+                .ownerId(item.getOwnerId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
+                .lastBookingDate(item.getLastBookingDate())
+                .nextBookingDate(item.getNextBookingDate())
                 .build();
     }
 

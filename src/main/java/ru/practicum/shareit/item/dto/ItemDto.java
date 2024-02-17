@@ -3,11 +3,9 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
+import java.time.LocalDateTime;
 
 /**
  * TODO Sprint add-controllers.
@@ -18,12 +16,13 @@ import javax.validation.constraints.NotNull;
 public class ItemDto {
     private Long id;
     @NotNull(message = "userId не может быть пустым")
-    private Long userId;
+    private Long ownerId;
     @NotBlank(message = "Неверное название")
     private String name;
     @NotBlank(message = "Неверное описание")
     private String description;
     @NotNull(message = "available не может быть пустым")
     private Boolean available;
-    private Integer numTimes;
+    private LocalDateTime lastBookingDate;
+    private LocalDateTime nextBookingDate;
 }

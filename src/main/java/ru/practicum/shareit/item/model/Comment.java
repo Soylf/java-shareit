@@ -9,13 +9,13 @@ import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Data
 @Builder
 @Table(name = "comments")
+@Data
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String text;
     @ManyToOne(fetch = FetchType.LAZY)
     private Item item;

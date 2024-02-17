@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 public class CommentDto {
-    private long id;
+    private Long id;
     private String text;
     private Item item;
     private User author;

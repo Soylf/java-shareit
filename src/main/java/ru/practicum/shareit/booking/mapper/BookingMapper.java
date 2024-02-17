@@ -38,5 +38,4 @@ public class BookingMapper {
                 .map(this::fromBooking)
                 .collect(Collectors.toList());
     }
-
 }

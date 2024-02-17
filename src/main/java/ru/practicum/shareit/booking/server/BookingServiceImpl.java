@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.error.exception.BadRequestException;
+import ru.practicum.shareit.error.exception.EntityNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -40,17 +41,42 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto getBooking(long userId, Long bookingId) {
-        return null;
+        for (Booking booking : bookingRepository.findAllBookingsSortedByUserId(userId)) {
+            if (booking.getId().equals(bookingId)) {
+                return mapper.fromBooking(booking);
+            }
+        }
+        throw new BadRequestException("Booking not found for userId: " + userId + " and bookingId: " + bookingId);
     }
 
     @Override
-    public List<BookingDto> getUserBookings(long userId, String state) {
-        return null;
+    public List<BookingDto> getUserBookings(long userId, BookingStatus state) {
+        List<Booking> bookings;
+
+        if (state == BookingStatus.ALL) {
+            bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
+        } else {
+            bookings = bookingRepository.findAllByBookerIdAndBookingStatusOrderByStartDesc(userId, state);
+        }
+
+        return mapper.toBookingTo(bookings);
     }
 
     @Override
-    public List<BookingDto> getOwnerItemsBooked(long userId, String state) {
-        return null;
+    public List<BookingDto> getUserItemsBooked(long userId, BookingStatus state) throws EntityNotFoundException {
+        List<Booking> bookings;
+
+        if (state == BookingStatus.ALL) {
+            bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
+        } else {
+            bookings = bookingRepository.findAllByItemOwnerIdAndBookingStatusOrderByStartDesc(userId, state);
+        }
+
+        if (bookings.isEmpty()) {
+            throw new EntityNotFoundException("У него нефига нет: " + userId);
+        }
+
+        return mapper.toBookingTo(bookings);
     }
 
     //Дополнительные методы

@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NonNull;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 /**
  * TODO Sprint add-controllers.
@@ -19,5 +21,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @Email(message = "Некорректный email")
+    @NotBlank(message = "Email не может быть пустым")
     private String email;
 }
