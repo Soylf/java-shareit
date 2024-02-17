@@ -3,9 +3,11 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -25,4 +27,5 @@ public class ItemDto {
     private Boolean available;
     private LocalDateTime lastBookingDate;
     private LocalDateTime nextBookingDate;
+    private List<CommentDto> commentDos;
 }

@@ -4,15 +4,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.error.exception.BadRequestException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +25,9 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
     private final ItemMapper itemMapper;
+    private final CommentMapper commentMapper;
 
 
     @Override
@@ -30,6 +37,19 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemMapper.fromDto(itemDto);
         item.setOwnerId(userId);
         return itemMapper.fromItem(item);
+    }
+
+    @Override
+    public void addComment(CommentDto commentDto, Long itemId, Long userId) {
+        checkItem(itemId);
+        checkUser(userId);
+
+        Comment comment = commentMapper.fromDto(commentDto);
+        comment.setAuthor(userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException("пользователя: " + userId + "  нет")));
+        comment.setItem(itemRepository.findById(itemId)
+                .orElseThrow(() -> new BadRequestException(("обьекта: " + itemId + " нет"))));
+        commentRepository.save(comment);
     }
 
     @Override
@@ -45,20 +65,37 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new BadRequestException("Предмета с ID " + itemId + " не существует"));
 
-
         item.setLastBookingDate(bookingRepository.getLastBookingDateForItem(itemId));
         item.setNextBookingDate(bookingRepository.getNextBookingDateForItem(itemId));
 
-        return Optional.of(itemMapper.fromItem(item));
+        // Получение комментариев для указанного itemId
+        List<Comment> comments = commentRepository.findAllByItemId(itemId);
+        List<CommentDto> commentDos = comments.stream()
+                .map(commentMapper::fromComment)
+                .collect(Collectors.toList());
+
+        ItemDto itemDto = itemMapper.fromItem(item);
+        itemDto.setCommentDos(commentDos);
+
+        return Optional.of(itemDto);
     }
 
     @Override
     public List<ItemDto> getAllItem(Long userId) {
-        List<Item> items = itemRepository.findAll();
+        List<Item> items = itemRepository.findAllByOwnerId(userId);
 
         for (Item item : items) {
             item.setLastBookingDate(bookingRepository.getLastBookingDateForItem(item.getId()));
             item.setNextBookingDate(bookingRepository.getNextBookingDateForItem(item.getId()));
+
+            // Получение комментариев для каждого предмета
+            List<Comment> comments = commentRepository.findAllByItemId(item.getId());
+            List<CommentDto> commentDos = comments.stream()
+                    .map(commentMapper::fromComment)
+                    .collect(Collectors.toList());
+
+            ItemDto itemDto = itemMapper.fromItem(item);
+            itemDto.setCommentDos(commentDos);
         }
 
         return itemMapper.toItemDto(items);
