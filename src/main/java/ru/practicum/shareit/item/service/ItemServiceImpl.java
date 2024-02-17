@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
@@ -14,6 +13,7 @@ import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,9 +46,9 @@ public class ItemServiceImpl implements ItemService {
 
         Comment comment = commentMapper.fromDto(commentDto);
         comment.setAuthor(userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException("пользователя: " + userId + "  нет")));
+                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет")));
         comment.setItem(itemRepository.findById(itemId)
-                .orElseThrow(() -> new BadRequestException(("обьекта: " + itemId + " нет"))));
+                .orElseThrow(() -> new EntityNotFoundException(("обьекта: " + itemId + " нет"))));
         commentRepository.save(comment);
     }
 
@@ -63,7 +63,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Optional<ItemDto> getItem(Long itemId) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new BadRequestException("Предмета с ID " + itemId + " не существует"));
+                .orElseThrow(() -> new EntityNotFoundException("Предмета с ID " + itemId + " не существует"));
 
         item.setLastBookingDate(bookingRepository.getLastBookingDateForItem(itemId));
         item.setNextBookingDate(bookingRepository.getNextBookingDateForItem(itemId));
@@ -123,11 +123,11 @@ public class ItemServiceImpl implements ItemService {
 
     private void checkUser(long userId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException("пользователя: " + userId + "  нет"));
+                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
     }
 
     private void checkItem(long itemId) {
         itemRepository.findById(itemId)
-                .orElseThrow(() -> new BadRequestException(("обьекта: " + itemId + " нет")));
+                .orElseThrow(() -> new EntityNotFoundException(("обьекта: " + itemId + " нет")));
     }
 }
