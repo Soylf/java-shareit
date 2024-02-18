@@ -2,12 +2,12 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,17 +24,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(UserDto userDto, Long id) {
-        userRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Пользователь с ID " + id + " не существует"));
+    public UserDto update(UserDto userDto, Long userId) {
+        checkUser(userId);
 
         return mapper.fromUser(userRepository.save(mapper.fromDto(userDto)));
     }
 
     @Override
-    public Optional<UserDto> getUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Пользователь с ID " + id + " не существует"));
+    public Optional<UserDto> getUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID " + userId + " не существует"));
         return Optional.of(mapper.fromUser(user));
     }
 
@@ -46,8 +45,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException("Пользователь с ID " + userId + " не существует"));
+        checkUser(userId);
         userRepository.deleteById(userId);
+    }
+
+    //дополнительыне методы
+    private void checkUser(Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID " + userId + " не существует"));
     }
 }

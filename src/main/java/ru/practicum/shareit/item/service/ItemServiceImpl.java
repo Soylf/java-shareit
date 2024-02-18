@@ -61,14 +61,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Optional<ItemDto> getItem(Long itemId) {
+    public Optional<ItemDto> getItem(Long itemId, Long userId) {
+        checkUser(userId);
+
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("Предмета с ID " + itemId + " не существует"));
 
         item.setLastBookingDate(bookingRepository.getLastBookingDateForItem(itemId));
         item.setNextBookingDate(bookingRepository.getNextBookingDateForItem(itemId));
 
-        // Получение комментариев для указанного itemId
+        // Получение комментариев для указанного предмета
         List<Comment> comments = commentRepository.findAllByItemId(itemId);
         List<CommentDto> commentDos = comments.stream()
                 .map(commentMapper::fromComment)

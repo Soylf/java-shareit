@@ -26,7 +26,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto create(long userId, BookingDto bookingDto) {
-        User booker = checkUser(userId);
+        User booker = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
         Item item = checkItem(bookingDto.getId());
 
         bookingDto.setBooker(booker);
@@ -119,8 +120,8 @@ public class BookingServiceImpl implements BookingService {
 
 
     //Дополнительные методы
-    private User checkUser(long userId) {
-        return userRepository.findById(userId)
+    private void checkUser(long userId) {
+        userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
     }
 
