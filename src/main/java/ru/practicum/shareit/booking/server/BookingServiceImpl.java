@@ -73,12 +73,14 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto getBooking(long userId, Long bookingId) {
         checkUser(userId);
 
-        for (Booking booking : bookingRepository.findAllBookingsSortedByUserId(userId)) {
-            if (booking.getId().equals(bookingId)) {
-                return mapper.fromBooking(booking);
-            }
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("брони: " + bookingId + "  нет"));
+        Item item = checkItem(booking.getItem().getId());
+
+        if (!item.getOwnerId().equals(userId) && !booking.getBooker().getId().equals(userId)) {
+            throw new EntityNotFoundException("не найден пользователь: " + userId + " и бронь: " + bookingId);
         }
-        throw new EntityNotFoundException("не найден пользователь: " + userId + " и бронь: " + bookingId);
+        return mapper.fromBooking(booking);
     }
 
     @Override
@@ -114,6 +116,7 @@ public class BookingServiceImpl implements BookingService {
 
         return mapper.toBookingTo(bookings);
     }
+
 
     //Дополнительные методы
     private User checkUser(long userId) {

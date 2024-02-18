@@ -26,6 +26,7 @@ public class UserMapper {
                 user.getEmail()
         );
     }
+
     public List<UserDto> toUserDto(List<User> users) {
         return users.stream()
                 .map(this::fromUser)

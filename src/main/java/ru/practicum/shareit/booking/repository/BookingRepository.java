@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findAllBookingsSortedByUserId(long userId);
 
     List<Booking> findAllByBookerIdAndBookingStatusOrderByStartDesc(long userId, BookingStatus state);
 
