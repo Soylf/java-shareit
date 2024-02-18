@@ -1,15 +1,19 @@
 package ru.practicum.shareit.item.model;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "comments")
 @Data
 public class Comment {
@@ -21,5 +25,6 @@ public class Comment {
     private Item item;
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
-    private ZonedDateTime created;
+    @Column(name = "created", columnDefinition = "timestamp")
+    private LocalDateTime created = LocalDateTime.now();
 }

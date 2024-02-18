@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 /**
  * TODO Sprint add-controllers.
@@ -21,6 +20,7 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "owner_id")
     private Long ownerId;
     @NotNull
     private String name;
@@ -29,8 +29,4 @@ public class Item {
     @NotNull
     @Column(name = "is_available")
     private Boolean available;
-    @Column(name = "last_booking_date")
-    private LocalDateTime lastBookingDate;
-    @Column(name = "next_booking_date")
-    private LocalDateTime nextBookingDate;
 }

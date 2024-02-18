@@ -38,4 +38,13 @@ public class BookingMapper {
                 .map(this::fromBooking)
                 .collect(Collectors.toList());
     }
+
+    public BookingDto toBookingDto(Booking booking) {
+        return BookingDto.builder()
+                .id(booking.getId())
+                .booker(booking.getBooker())
+                .start(booking.getStart())
+                .end(booking.getEnd())
+                .build();
+    }
 }

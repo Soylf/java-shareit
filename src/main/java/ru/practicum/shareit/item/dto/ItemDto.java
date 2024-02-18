@@ -3,10 +3,10 @@ package ru.practicum.shareit.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import ru.practicum.shareit.booking.dto.BookingDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -25,7 +25,7 @@ public class ItemDto {
     private String description;
     @NotNull(message = "available не может быть пустым")
     private Boolean available;
-    private LocalDateTime lastBookingDate;
-    private LocalDateTime nextBookingDate;
+    private BookingDto lastBookingDate;
+    private BookingDto nextBookingDate;
     private List<CommentDto> commentDos;
 }

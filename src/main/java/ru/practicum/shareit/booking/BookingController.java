@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/bookings")
 @AllArgsConstructor
+@Slf4j
 public class BookingController {
     private final BookingService service;
 
@@ -30,7 +32,7 @@ public class BookingController {
         return service.updateStatus(userId,bookingId,approved);
     }
 
-    @GetMapping
+    @GetMapping("/bookings/{bookingId}")
     public BookingDto getBooking(@RequestHeader("X-Sharer-User-Id")
                                      long userId, @PathVariable Long bookingId) {
         return service.getBooking(userId,bookingId);

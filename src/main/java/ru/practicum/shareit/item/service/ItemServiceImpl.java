@@ -1,7 +1,11 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -14,10 +18,12 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +34,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
+    private final BookingMapper bookingMapper;
 
 
     @Override
@@ -66,41 +73,42 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("Предмета с ID " + itemId + " не существует"));
+        List<CommentDto> comments = commentMapper.toListComment(commentRepository.findAllByItemIdOrderByCreatedDesc(itemId));
+        ItemDto itemDto = itemMapper.toItemDtoAndCommits(item, null, null, comments);
 
-        item.setLastBookingDate(bookingRepository.getLastBookingDateForItem(itemId));
-        item.setNextBookingDate(bookingRepository.getNextBookingDateForItem(itemId));
 
-        // Получение комментариев для указанного предмета
-        List<Comment> comments = commentRepository.findAllByItemId(itemId);
-        List<CommentDto> commentDos = comments.stream()
-                .map(commentMapper::fromComment)
-                .collect(Collectors.toList());
+        List<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndEndIsBeforeAndBookingStatusIs(
+                itemId, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(DESC, "end"));
+        List<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndEndIsAfterAndBookingStatusIs(
+                itemId, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "end"));
 
-        ItemDto itemDto = itemMapper.fromItem(item);
-        itemDto.setCommentDos(commentDos);
+        if (lastBooking.isEmpty() && !nextBooking.isEmpty()) {
+            itemDto.setLastBookingDate(bookingMapper.toBookingDto(nextBooking.get(0)));
+            itemDto.setNextBookingDate(null);
+        } else if (!lastBooking.isEmpty() && !nextBooking.isEmpty()) {
+            itemDto.setNextBookingDate(bookingMapper.toBookingDto(nextBooking.get(0)));
+            itemDto.setLastBookingDate(bookingMapper.toBookingDto(lastBooking.get(0)));
+        }
 
         return Optional.of(itemDto);
     }
 
     @Override
     public List<ItemDto> getAllItem(Long userId) {
-        List<Item> items = itemRepository.findAllByOwnerId(userId);
+        List<ItemDto> itemDos = new ArrayList<>();
+
+        List<Item> items = itemRepository.findItemsByOwnerIdOrderByIdAsc(userId);
 
         for (Item item : items) {
-            item.setLastBookingDate(bookingRepository.getLastBookingDateForItem(item.getId()));
-            item.setNextBookingDate(bookingRepository.getNextBookingDateForItem(item.getId()));
-
-            // Получение комментариев для каждого предмета
-            List<Comment> comments = commentRepository.findAllByItemId(item.getId());
-            List<CommentDto> commentDos = comments.stream()
-                    .map(commentMapper::fromComment)
-                    .collect(Collectors.toList());
-
-            ItemDto itemDto = itemMapper.fromItem(item);
-            itemDto.setCommentDos(commentDos);
+            List<CommentDto> comments = commentMapper
+                    .toListComment(commentRepository.findAllByItemIdOrderByCreatedDesc(item.getId()));
+            itemDos.add(itemMapper.toItemDtoAndCommits(item,
+                    bookingMapper.fromBooking(bookingRepository.findFirstByItem_idAndEndBeforeOrderByEndDesc(item.getId(), LocalDateTime.now())),
+                    bookingMapper.fromBooking(bookingRepository.findFirstByItem_idAndStartAfterOrderByStartAsc(item.getId(), LocalDateTime.now())),
+                    comments));
         }
 
-        return itemMapper.toItemDto(items);
+        return itemDos;
     }
 
     @Override
