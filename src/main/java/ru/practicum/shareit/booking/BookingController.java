@@ -1,13 +1,15 @@
 package ru.practicum.shareit.booking;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.server.BookingService;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -15,38 +17,47 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(path = "/bookings")
-@AllArgsConstructor
 @Slf4j
 public class BookingController {
     private final BookingService service;
 
-    @PostMapping
-    public BookingDto create(@RequestHeader("X-Sharer-User-Id") long userId,
-                             @RequestBody BookingDto bookingDto) {
-        return service.create(userId,bookingDto);
+    @Autowired
+    public BookingController(BookingService service) {
+        this.service = service;
     }
 
-    @PatchMapping
-    public BookingDto updateStatus(@RequestHeader("X-Sharer-User-Id") long userId,
-                                   @PathVariable Long bookingId, @RequestParam boolean approved) {
+    @PostMapping
+    public BookingDto create(@RequestHeader("X-Sharer-User-Id") long userId,
+                             @Valid @RequestBody BookingRequestDto bookingRequestDto) {
+        log.info("Получен запрос на создание брони от " + userId + " с такой броней {}",bookingRequestDto);
+        return service.create(userId,bookingRequestDto);
+    }
+
+    @PatchMapping("/{bookingId}")
+    public BookingDto updateStatus(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long bookingId,
+                                   @RequestParam(name = "approved", required = false) Boolean approved) {
+        log.info("Полчен запрос на обновление бронирования от " + userId + " на бронь  {}", bookingId);
         return service.updateStatus(userId,bookingId,approved);
     }
 
-    @GetMapping("/bookings/{bookingId}")
+    @GetMapping("/{bookingId}")
     public BookingDto getBooking(@RequestHeader("X-Sharer-User-Id")
                                      long userId, @PathVariable Long bookingId) {
+        log.info("Поулчен запрос поулчение брони от " + userId + " по такому id {}", bookingId);
         return service.getBooking(userId,bookingId);
     }
 
     @GetMapping
     public List<BookingDto> getUserBookings(@RequestHeader("X-Sharer-User-Id") long userId,
                                             @RequestParam(required = false, defaultValue = "ALL") BookingStatus state) {
+        log.info("Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
         return service.getUserBookings(userId,state);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getUserItemsBooked(@RequestHeader("X-Sharer-User-Id") long userId,
                                                 @RequestParam(required = false, defaultValue = "ALL") BookingStatus state) throws EntityNotFoundException {
+        log.info("(owner)Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
         return service.getUserItemsBooked(userId,state);
     }
 }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.server;
 
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
 
@@ -9,7 +10,7 @@ import java.util.List;
 public interface BookingService {
 
 
-    BookingDto create(long userId, BookingDto bookingDto);
+    BookingDto create(long userId, BookingRequestDto bookingRequestDto);
 
     BookingDto updateStatus(long userId, Long bookingId, boolean approved);
 

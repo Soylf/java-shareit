@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
@@ -21,7 +22,7 @@ public class BookingMapper {
                 .end(bookingDto.getEnd())
                 .item(bookingDto.getItem())
                 .booker(bookingDto.getBooker())
-                .bookingStatus(bookingDto.getBookingStatus())
+                .bookingStatus(bookingDto.getStatus())
                 .build();
     }
 
@@ -32,7 +33,7 @@ public class BookingMapper {
                 .end(booking.getEnd())
                 .item(booking.getItem())
                 .booker(booking.getBooker())
-                .bookingStatus(booking.getBookingStatus())
+                .status(booking.getBookingStatus())
                 .build();
     }
 
@@ -51,13 +52,13 @@ public class BookingMapper {
                 .build();
     }
 
-    public Booking toBookerTo(BookingDto bookingDto, User booker, Item item, BookingStatus bookingStatus) {
+    public Booking toBookerTo(BookingRequestDto bookingRequestDto, User booker, Item item, BookingStatus bookingStatus) {
         return Booking.builder()
+                .bookingStatus(bookingStatus)
                 .booker(booker)
                 .item(item)
-                .start(bookingDto.getStart())
-                .end(bookingDto.getEnd())
-                .bookingStatus(bookingStatus)
+                .start(bookingRequestDto.getStart())
+                .end(bookingRequestDto.getEnd())
                 .build();
     }
 }

@@ -3,21 +3,25 @@ package ru.practicum.shareit.booking.server;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
@@ -25,16 +29,12 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper mapper;
 
     @Override
-    public BookingDto create(long userId, BookingDto bookingDto) {
+    public BookingDto create(long userId, BookingRequestDto bookingRequestDto) {
         User booker = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
 
-        if (bookingDto.getItem() == null) {
-            throw new EntityNotFoundException("Предмет не указан");
-        }
-
-        Item item = itemRepository.findById(bookingDto.getItem().getId())
-                .orElseThrow(() -> new EntityNotFoundException("предмета: " + bookingDto.getItem().getId() + "  нет"));
+        Item item = itemRepository.findById(bookingRequestDto.getItemId())
+                .orElseThrow(() -> new EntityNotFoundException("предмета: " + bookingRequestDto.getItemId() + "  нет"));
 
         if (!item.getAvailable()) {
             throw new EntityNotFoundException("Вещь недоступна для бронирования");
@@ -43,13 +43,14 @@ public class BookingServiceImpl implements BookingService {
         if (item.getOwner().getId().equals(userId)) {
             throw new EntityNotFoundException("Вы не можете бронировать свою вещь");
         }
-        if (bookingDto.getStart().isAfter(bookingDto.getEnd())
-                || bookingDto.getStart().equals(bookingDto.getEnd())
-                || bookingDto.getEnd().isBefore(LocalDateTime.now())) {
+
+        if (bookingRequestDto.getStart().isAfter(bookingRequestDto.getEnd())
+                || bookingRequestDto.getStart().equals(bookingRequestDto.getEnd())
+                || bookingRequestDto.getEnd().isBefore(LocalDateTime.now())) {
             throw new EntityNotFoundException("Время бронирования неверное");
         }
 
-        Booking booking = mapper.toBookerTo(bookingDto,booker,item,BookingStatus.WAITING);
+        Booking booking = mapper.toBookerTo(bookingRequestDto, booker, item, BookingStatus.WAITING);
 
         return mapper.fromBooking(bookingRepository.save(booking));
     }
@@ -96,10 +97,27 @@ public class BookingServiceImpl implements BookingService {
 
         List<Booking> bookings;
 
-        if (state == BookingStatus.ALL) {
-            bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
-        } else {
-            bookings = bookingRepository.findAllByBookerIdAndBookingStatusOrderByStartDesc(userId, state);
+        switch (state) {
+            case ALL:
+                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
+                break;
+            case CURRENT:
+                bookings = bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId, LocalDateTime.now(), LocalDateTime.now());
+                break;
+            case PAST:
+                bookings = bookingRepository.findAllByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                break;
+            case FUTURE:
+                bookings = bookingRepository.findAllByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now());
+                break;
+            case WAITING:
+                bookings = bookingRepository.findAllByBookerIdAndBookingStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+                break;
+            case REJECTED:
+                bookings = bookingRepository.findAllByBookerIdAndBookingStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid booking status: " + state);
         }
 
         return mapper.toBookingTo(bookings);
@@ -110,15 +128,27 @@ public class BookingServiceImpl implements BookingService {
         checkUser(userId);
 
         List<Booking> bookings;
-
-        if (state == BookingStatus.ALL) {
-            bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
-        } else {
-            bookings = bookingRepository.findAllByItemOwnerIdAndBookingStatusOrderByStartDesc(userId, state);
-        }
-
-        if (bookings.isEmpty()) {
-            throw new EntityNotFoundException("У него нефига нет: " + userId);
+        switch (state) {
+            case ALL:
+                bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
+                break;
+            case CURRENT:
+                bookings = bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId, LocalDateTime.now(), LocalDateTime.now());
+                break;
+            case PAST:
+                bookings = bookingRepository.findAllByBooker_IdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                break;
+            case FUTURE:
+                bookings = bookingRepository.findAllByBooker_IdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now());
+                break;
+            case WAITING:
+                bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+                break;
+            case REJECTED:
+                bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+                break;
+            default:
+                throw new BadRequestException("Что-то пошло не так");
         }
 
         return mapper.toBookingTo(bookings);
