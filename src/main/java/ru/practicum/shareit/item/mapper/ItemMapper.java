@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class ItemMapper {
     public Item fromDto(ItemDto itemDto) {
         return Item.builder()
                 .id(itemDto.getId())
-                .ownerId(itemDto.getOwnerId())
+                .owner(itemDto.getOwner())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
@@ -28,7 +29,7 @@ public class ItemMapper {
     public ItemDto fromItem(Item item) {
         return ItemDto.builder()
                 .id(item.getId())
-                .ownerId(item.getOwnerId())
+                .owner(item.getOwner())
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
@@ -48,5 +49,11 @@ public class ItemMapper {
                 .nextBookingDate(nextBooking)
                 .commentDos(commentDos)
                 .build();
+    }
+
+    public List<ItemDto> toItemDos (List<Item> item) {
+        return item.stream()
+                .map(this::fromItem)
+                .collect(Collectors.toList());
     }
 }

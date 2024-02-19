@@ -7,12 +7,12 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.error.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,25 +28,30 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto create(long userId, BookingDto bookingDto) {
         User booker = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
-        Item item = checkItem(bookingDto.getId());
 
-        bookingDto.setBooker(booker);
-        bookingDto.setBookingStatus(BookingStatus.WAITING);
+        if (bookingDto.getItem() == null) {
+            throw new EntityNotFoundException("Предмет не указан");
+        }
+
+        Item item = itemRepository.findById(bookingDto.getItem().getId())
+                .orElseThrow(() -> new EntityNotFoundException("предмета: " + bookingDto.getItem().getId() + "  нет"));
 
         if (!item.getAvailable()) {
             throw new EntityNotFoundException("Вещь недоступна для бронирования");
         }
 
-        if (item.getOwnerId().equals(userId)) {
+        if (item.getOwner().getId().equals(userId)) {
             throw new EntityNotFoundException("Вы не можете бронировать свою вещь");
         }
         if (bookingDto.getStart().isAfter(bookingDto.getEnd())
                 || bookingDto.getStart().equals(bookingDto.getEnd())
                 || bookingDto.getEnd().isBefore(LocalDateTime.now())) {
-            throw new EntityNotFoundException("Время бронировани неверное");
+            throw new EntityNotFoundException("Время бронирования неверное");
         }
 
-        return mapper.fromBooking(bookingRepository.save(mapper.fromDto(bookingDto)));
+        Booking booking = mapper.toBookerTo(bookingDto,booker,item,BookingStatus.WAITING);
+
+        return mapper.fromBooking(bookingRepository.save(booking));
     }
 
     @Override
@@ -62,7 +67,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getBooker().getId().equals(userId)) {
             throw new EntityNotFoundException("Только владелец вещи может подтвердить бронирование");
         }
-        if (!booking.getItem().getOwnerId().equals(userId)) {
+        if (!booking.getItem().getOwner().getId().equals(userId)) {
             throw new EntityNotFoundException("Только владелец вещи может подтвердить бронирование");
         }
 
@@ -76,9 +81,10 @@ public class BookingServiceImpl implements BookingService {
 
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("брони: " + bookingId + "  нет"));
-        Item item = checkItem(booking.getItem().getId());
+        Item item = itemRepository.findById(booking.getItem().getId())
+                .orElseThrow(() -> new EntityNotFoundException("придмета: " + booking.getItem().getId() + "  нет"));
 
-        if (!item.getOwnerId().equals(userId) && !booking.getBooker().getId().equals(userId)) {
+        if (!item.getOwner().getId().equals(userId) && !booking.getBooker().getId().equals(userId)) {
             throw new EntityNotFoundException("не найден пользователь: " + userId + " и бронь: " + bookingId);
         }
         return mapper.fromBooking(booking);
@@ -100,7 +106,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getUserItemsBooked(long userId, BookingStatus state) throws EntityNotFoundException {
+    public List<BookingDto> getUserItemsBooked(long userId, BookingStatus state) {
         checkUser(userId);
 
         List<Booking> bookings;
@@ -125,8 +131,8 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
     }
 
-    private Item checkItem(long itemId) {
-        return itemRepository.findById(itemId)
+    private void checkItem(long itemId) {
+        itemRepository.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("придмета: " + itemId + "  нет"));
     }
 }

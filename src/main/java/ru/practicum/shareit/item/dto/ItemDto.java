@@ -1,9 +1,11 @@
 package ru.practicum.shareit.item.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,8 +19,9 @@ import java.util.List;
 @Builder
 public class ItemDto {
     private Long id;
-    @NotNull(message = "userId не может быть пустым")
-    private Long ownerId;
+    @NotNull(message = "user не может быть пустым")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private User owner;
     @NotBlank(message = "Неверное название")
     private String name;
     @NotBlank(message = "Неверное описание")

@@ -24,9 +24,8 @@ public class ItemController {
     }
 
     @PostMapping("/items/{itemId}/comment")
-    public boolean addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId, @RequestBody CommentDto commentDto) {
-        service.addComment(commentDto,itemId,userId);
-        return true;
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId, @RequestBody CommentDto commentDto) {
+        return service.addComment(commentDto,itemId,userId);
     }
 
     @PatchMapping("/{itemId}")

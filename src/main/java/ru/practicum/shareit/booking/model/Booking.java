@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking.model;
 
 import lombok.Builder;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -20,15 +22,17 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "start_date")
-    @NotNull
+    @Column(name = "start_date", columnDefinition = "timestamp", nullable = false)
     private LocalDateTime start;
-    @Column(name = "end_date")
-    @NotNull
+    @Column(name = "end_date", columnDefinition = "timestamp", nullable = false)
     private LocalDateTime end;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", nullable = false)
+    @ManyToOne(optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Item item;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booker_id", nullable = false)
+    @ManyToOne(optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User booker;
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

@@ -1,9 +1,12 @@
 package ru.practicum.shareit.item.model;
 
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 
@@ -13,6 +16,7 @@ import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Entity
 @Table(name = "items")
@@ -20,13 +24,14 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "owner_id")
-    private Long ownerId;
-    @NotNull
+    @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User owner;
+    @Column(name = "name", nullable = false)
     private String name;
-    @NotNull
+    @Column(name = "description")
     private String description;
-    @NotNull
-    @Column(name = "is_available")
+    @Column(name = "is_available", nullable = false)
     private Boolean available;
 }
