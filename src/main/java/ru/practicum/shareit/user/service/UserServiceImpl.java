@@ -53,9 +53,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<UserDto> getUser(Long userId) {
-        User user = userRepository.findById(userId)
+        User booker = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID " + userId + " не существует"));
-        return Optional.of(mapper.fromUser(user));
+        return Optional.of(mapper.fromUser(booker));
     }
 
     @Override
