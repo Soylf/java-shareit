@@ -6,10 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ru.practicum.shareit.error.exception.ApiError;
-import ru.practicum.shareit.error.exception.BadConflictException;
-import ru.practicum.shareit.error.exception.BadRequestException;
-import ru.practicum.shareit.error.exception.EntityNotFoundException;
+import ru.practicum.shareit.error.exception.*;
 
 @Slf4j
 @RestControllerAdvice("ru.practicum.shareit")
@@ -41,5 +38,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ApiError handleBadConflictException(final BadConflictException e) {
         log.info("409 {}", e.getMessage());
         return new ApiError(e.getMessage());
+    }
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ApiError handleNoEnumValueArgumentException(final NoEnumValueArgumentException e) {
+        log.error("Unknown state: UNSUPPORTED_STATUS, {}", e.getMessage());
+        return new ApiError("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
     }
 }

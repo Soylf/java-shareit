@@ -48,11 +48,11 @@ public class ItemServiceImpl implements ItemService {
             throw new EntityNotFoundException("Такого пользователя нет");
         }
 
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
 
-            itemDto.setOwner(user);
-            return itemMapper.fromItem(itemRepository.save(itemMapper.fromDto(itemDto)));
+        itemDto.setOwner(user);
+        return itemMapper.fromItem(itemRepository.save(itemMapper.fromDto(itemDto)));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
                             && booking.getBookingStatus() != BookingStatus.WAITING
                             && booking.getEnd().isBefore(LocalDateTime.now()));
             if (hasActiveBooking) {
-                Comment comment = commentMapper.fromCommentTo(commentResponseDto,user,item);
+                Comment comment = commentMapper.fromCommentTo(commentResponseDto, user, item);
 
                 return commentMapper.toResponseDto(commentRepository.save(comment));
             } else {
@@ -125,10 +125,10 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndEndIsAfterAndBookingStatusIs(
                 itemId, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "end"));
 
-        if(!lastBooking.isEmpty() && !nextBooking.isEmpty()) {
+        if (!lastBooking.isEmpty() && !nextBooking.isEmpty()) {
             itemDto.setLastBooking(bookingMapper.fromBookingDto(lastBooking.get(0)));
             itemDto.setNextBooking(bookingMapper.fromBookingDto(nextBooking.get(0)));
-        }else if (lastBooking.isEmpty() && !nextBooking.isEmpty()) {
+        } else if (lastBooking.isEmpty() && !nextBooking.isEmpty()) {
             itemDto.setLastBooking(bookingMapper.fromBookingDto(nextBooking.get(0)));
             itemDto.setNextBooking(null);
         }

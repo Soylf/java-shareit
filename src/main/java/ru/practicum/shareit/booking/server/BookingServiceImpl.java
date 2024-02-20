@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
+import ru.practicum.shareit.error.exception.NoEnumValueArgumentException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -94,9 +95,9 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAllOwner(long ownerId, String state) {
         checkUser(ownerId);
+        checkState(state);
 
         List<Booking> bookings;
-
         switch (state.toUpperCase()) {
             case "ALL":
                 bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId);
@@ -117,7 +118,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findByItemOwnerIdAndBookingStatusOrderByStartDesc(ownerId, BookingStatus.REJECTED);
                 break;
             default:
-                throw new BadRequestException("Unknown state: " + state);
+                throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
         }
 
         return mapper.toBookingTo(bookings);
@@ -126,6 +127,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAllUser(long userId, String state) {
         checkUser(userId);
+        checkState(state);
 
         List<Booking> bookings;
         switch (state.toUpperCase()) {
@@ -148,7 +150,7 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
                 break;
             default:
-                throw new BadRequestException("Unknown state: " + state);
+                throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
         }
 
         return mapper.toBookingTo(bookings);
@@ -159,5 +161,15 @@ public class BookingServiceImpl implements BookingService {
     private void checkUser(long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+    }
+
+    private void checkState(String state) {
+        BookingStatus[] values = BookingStatus.values();
+        for (BookingStatus val: values) {
+            if (state.equals(val.name())) {
+                return;
+            }
+        }
+        throw new NoEnumValueArgumentException(("Unknown state: " + state));
     }
 }

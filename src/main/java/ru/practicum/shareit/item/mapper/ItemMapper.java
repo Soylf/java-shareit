@@ -36,16 +36,16 @@ public class ItemMapper {
                 .build();
     }
 
-    public List<ItemDto> toItemDos (List<Item> item) {
+    public List<ItemDto> toItemDos(List<Item> item) {
         return item.stream()
                 .map(this::fromItem)
                 .collect(Collectors.toList());
     }
 
     public ItemDto toItemResponseDto(Item item,
-                                                    Booking lastBooking,
-                                                    Booking nextBooking,
-                                                    List<CommentResponseDto> comments) {
+                                     Booking lastBooking,
+                                     Booking nextBooking,
+                                     List<CommentResponseDto> comments) {
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())

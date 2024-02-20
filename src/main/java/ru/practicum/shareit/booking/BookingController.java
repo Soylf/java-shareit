@@ -27,35 +27,35 @@ public class BookingController {
     @PostMapping
     public BookingDto create(@RequestHeader("X-Sharer-User-Id") long userId,
                              @Valid @RequestBody BookingRequestDto bookingRequestDto) {
-        log.info("Получен запрос на создание брони от " + userId + " с такой броней {}",bookingRequestDto);
-        return service.create(userId,bookingRequestDto);
+        log.info("Получен запрос на создание брони от " + userId + " с такой броней {}", bookingRequestDto);
+        return service.create(userId, bookingRequestDto);
     }
 
     @PatchMapping("/{bookingId}")
     public BookingDto updateStatus(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long bookingId,
                                    @RequestParam(name = "approved", required = false) Boolean approved) {
         log.info("Полчен запрос на обновление бронирования от " + userId + " на бронь  {}", bookingId);
-        return service.updateStatus(userId,bookingId,approved);
+        return service.updateStatus(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
     public BookingDto getBooking(@RequestHeader("X-Sharer-User-Id")
-                                     long userId, @PathVariable Long bookingId) {
+                                 long userId, @PathVariable Long bookingId) {
         log.info("Поулчен запрос поулчение брони от " + userId + " по такому id {}", bookingId);
-        return service.getBooking(userId,bookingId);
+        return service.getBooking(userId, bookingId);
     }
 
     @GetMapping
     public List<BookingDto> getAllUser(@RequestHeader("X-Sharer-User-Id") long userId,
-                                            @RequestParam(required = false, defaultValue = "ALL") String state) {
+                                       @RequestParam(required = false, defaultValue = "ALL") String state) {
         log.info("Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
-        return service.getAllUser(userId,state);
+        return service.getAllUser(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllOwner(@RequestHeader("X-Sharer-User-Id") long userId,
-                                               @RequestParam(required = false, defaultValue = "ALL") String state) {
+                                        @RequestParam(required = false, defaultValue = "ALL") String state) {
         log.info("(owner)Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
-        return service.getAllOwner(userId,state);
+        return service.getAllOwner(userId, state);
     }
 }
