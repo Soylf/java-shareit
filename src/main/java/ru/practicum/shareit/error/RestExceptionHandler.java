@@ -39,6 +39,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.info("409 {}", e.getMessage());
         return new ApiError(e.getMessage());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ApiError handleNoEnumValueArgumentException(final NoEnumValueArgumentException e) {
