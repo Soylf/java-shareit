@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -27,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.data.domain.Sort.Direction.DESC;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -48,8 +45,7 @@ public class ItemServiceImpl implements ItemService {
             throw new EntityNotFoundException("Такого пользователя нет");
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
 
         itemDto.setOwner(user);
         return itemMapper.fromItem(itemRepository.save(itemMapper.fromDto(itemDto)));
@@ -57,19 +53,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentResponseDto addComment(CommentResponseDto commentResponseDto, Long itemId, Long userId) {
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("Обьект: " + userId + "  нет"));
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("Обьект: " + userId + "  нет"));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
 
         List<Booking> bookings = bookingRepository.findByItem_IdAndBooker_IdOrderByStartDesc(itemId, userId);
 
         if (!bookings.isEmpty()) {
-            boolean hasActiveBooking = bookings.stream()
-                    .anyMatch(booking -> booking.getBookingStatus() != BookingStatus.REJECTED
-                            && booking.getBookingStatus() != BookingStatus.WAITING
-                            && booking.getEnd().isBefore(LocalDateTime.now()));
+            boolean hasActiveBooking = bookings.stream().anyMatch(booking -> booking.getBookingStatus() != BookingStatus.REJECTED && booking.getBookingStatus() != BookingStatus.WAITING && booking.getEnd().isBefore(LocalDateTime.now()));
             if (hasActiveBooking) {
                 Comment comment = commentMapper.fromCommentTo(commentResponseDto, user, item);
 
@@ -87,8 +78,7 @@ public class ItemServiceImpl implements ItemService {
         checkUser(userId);
 
         try {
-            Item item = itemRepository.findById(itemId)
-                    .orElseThrow(() -> new EntityNotFoundException(("обьекта: " + itemId + " нет")));
+            Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException(("обьекта: " + itemId + " нет")));
 
 
             if (itemDto.getName() != null) {
@@ -109,8 +99,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Optional<ItemDto> getItem(Long itemId, Long userId) {
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("Предмета с ID " + itemId + " не существует"));
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("Предмета с ID " + itemId + " не существует"));
         List<CommentResponseDto> comments = commentMapper.toListComment(commentRepository.findAllByItemIdOrderByCreatedDesc(itemId));
         ItemDto itemDto = itemMapper.toItemResponseDto(item, null, null, comments);
 
@@ -120,10 +109,8 @@ public class ItemServiceImpl implements ItemService {
         }
 
 
-        List<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndEndIsBeforeAndBookingStatusIs(
-                itemId, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(DESC, "end"));
-        List<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndEndIsAfterAndBookingStatusIs(
-                itemId, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "end"));
+        List<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndEndBeforeAndBookingStatusOrderByEndDesc(itemId, LocalDateTime.now(), BookingStatus.APPROVED);
+        List<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndEndAfterAndBookingStatusOrderByEndAsc(itemId, LocalDateTime.now(), BookingStatus.APPROVED);
 
         if (!lastBooking.isEmpty() && !nextBooking.isEmpty()) {
             itemDto.setLastBooking(bookingMapper.fromBookingDto(lastBooking.get(0)));
@@ -146,12 +133,8 @@ public class ItemServiceImpl implements ItemService {
         }
 
         for (Item item : items) {
-            List<CommentResponseDto> comments = commentMapper
-                    .toListComment(commentRepository.findAllByItemIdOrderByCreatedDesc(item.getId()));
-            itemDos.add(itemMapper.toItemResponseDto(item,
-                    bookingRepository.findFirstByItem_idAndEndBeforeOrderByEndDesc(item.getId(), LocalDateTime.now()),
-                    bookingRepository.findFirstByItem_idAndStartAfterOrderByStartAsc(item.getId(), LocalDateTime.now()),
-                    comments));
+            List<CommentResponseDto> comments = commentMapper.toListComment(commentRepository.findAllByItemIdOrderByCreatedDesc(item.getId()));
+            itemDos.add(itemMapper.toItemResponseDto(item, bookingRepository.findFirstByItem_idAndEndBeforeOrderByEndDesc(item.getId(), LocalDateTime.now()), bookingRepository.findFirstByItem_idAndStartAfterOrderByStartAsc(item.getId(), LocalDateTime.now()), comments));
         }
 
         return itemDos;
@@ -167,7 +150,6 @@ public class ItemServiceImpl implements ItemService {
 
     //Дополнительные методы
     private void checkUser(long userId) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
     }
 }
