@@ -37,7 +37,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new EntityNotFoundException("предмета: " + bookingRequestDto.getItemId() + "  нет"));
 
         if (!item.getAvailable()) {
-            throw new EntityNotFoundException("Вещь недоступна для бронирования");
+            throw new BadRequestException("Вещь недоступна для бронирования");
         }
 
         if (item.getOwner().getId().equals(userId)) {
@@ -47,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
         if (bookingRequestDto.getStart().isAfter(bookingRequestDto.getEnd())
                 || bookingRequestDto.getStart().equals(bookingRequestDto.getEnd())
                 || bookingRequestDto.getEnd().isBefore(LocalDateTime.now())) {
-            throw new EntityNotFoundException("Время бронирования неверное");
+            throw new BadRequestException("Время бронирования неверное");
         }
 
         Booking booking = mapper.toBookerTo(bookingRequestDto, booker, item, BookingStatus.WAITING);
@@ -56,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDto updateStatus(long userId, Long bookingId, boolean approved) {
+    public BookingDto updateStatus(long userId, Long bookingId, Boolean approved) {
         checkUser(userId);
 
         Booking booking = bookingRepository.findById(bookingId)
@@ -92,63 +92,63 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getUserBookings(long userId, BookingStatus state) {
-        checkUser(userId);
+    public List<BookingDto> getAllOwner(long ownerId, String state) {
+        checkUser(ownerId);
 
         List<Booking> bookings;
 
-        switch (state) {
-            case ALL:
-                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
+        switch (state.toUpperCase()) {
+            case "ALL":
+                bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId);
                 break;
-            case CURRENT:
-                bookings = bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId, LocalDateTime.now(), LocalDateTime.now());
+            case "CURRENT":
+                bookings = bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(ownerId, LocalDateTime.now(), LocalDateTime.now());
                 break;
-            case PAST:
-                bookings = bookingRepository.findAllByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now());
+            case "PAST":
+                bookings = bookingRepository.findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(ownerId, LocalDateTime.now());
                 break;
-            case FUTURE:
-                bookings = bookingRepository.findAllByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now());
+            case "FUTURE":
+                bookings = bookingRepository.findByItemOwnerIdAndStartIsAfterOrderByStartDesc(ownerId, LocalDateTime.now());
                 break;
-            case WAITING:
-                bookings = bookingRepository.findAllByBookerIdAndBookingStatusOrderByStartDesc(userId, BookingStatus.WAITING);
+            case "WAITING":
+                bookings = bookingRepository.findByItemOwnerIdAndBookingStatusOrderByStartDesc(ownerId, BookingStatus.WAITING);
                 break;
-            case REJECTED:
-                bookings = bookingRepository.findAllByBookerIdAndBookingStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
+            case "REJECTED":
+                bookings = bookingRepository.findByItemOwnerIdAndBookingStatusOrderByStartDesc(ownerId, BookingStatus.REJECTED);
                 break;
             default:
-                throw new IllegalArgumentException("Invalid booking status: " + state);
+                throw new BadRequestException("Unknown state: " + state);
         }
 
         return mapper.toBookingTo(bookings);
     }
 
     @Override
-    public List<BookingDto> getUserItemsBooked(long userId, BookingStatus state) {
+    public List<BookingDto> getAllUser(long userId, String state) {
         checkUser(userId);
 
         List<Booking> bookings;
-        switch (state) {
-            case ALL:
+        switch (state.toUpperCase()) {
+            case "ALL":
                 bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
                 break;
-            case CURRENT:
+            case "CURRENT":
                 bookings = bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId, LocalDateTime.now(), LocalDateTime.now());
                 break;
-            case PAST:
+            case "PAST":
                 bookings = bookingRepository.findAllByBooker_IdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now());
                 break;
-            case FUTURE:
+            case "FUTURE":
                 bookings = bookingRepository.findAllByBooker_IdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now());
                 break;
-            case WAITING:
+            case "WAITING":
                 bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.WAITING);
                 break;
-            case REJECTED:
+            case "REJECTED":
                 bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
                 break;
             default:
-                throw new BadRequestException("Что-то пошло не так");
+                throw new BadRequestException("Unknown state: " + state);
         }
 
         return mapper.toBookingTo(bookings);
@@ -159,10 +159,5 @@ public class BookingServiceImpl implements BookingService {
     private void checkUser(long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
-    }
-
-    private void checkItem(long itemId) {
-        itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException("придмета: " + itemId + "  нет"));
     }
 }

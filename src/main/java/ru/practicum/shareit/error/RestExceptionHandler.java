@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.practicum.shareit.error.exception.ApiError;
+import ru.practicum.shareit.error.exception.BadConflictException;
 import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
 
@@ -32,6 +33,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected ApiError handleThrowable(final Throwable e) {
         log.info("500 {}", e.getMessage());
+        return new ApiError(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    protected ApiError handleBadConflictException(final BadConflictException e) {
+        log.info("409 {}", e.getMessage());
         return new ApiError(e.getMessage());
     }
 }

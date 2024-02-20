@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.error.exception.BadConflictException;
 import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -27,7 +28,7 @@ public class UserServiceImpl implements UserService {
             checkEmail(userDto);
             return mapper.fromUser(userRepository.save(mapper.fromDto(userDto)));
         } catch (DataIntegrityViolationException e) {
-            throw new BadRequestException("Что-то пошло не так");
+            throw new BadConflictException("Что-то пошло не так");
         }
     }
 
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
 
     private void checkEmail(UserDto userDto) {
         if (userDto.getEmail() == null || !userDto.getEmail().contains("@")) {
-            throw new EntityNotFoundException("Некорректный email");
+            throw new BadRequestException("Некорректный email");
         }
     }
 

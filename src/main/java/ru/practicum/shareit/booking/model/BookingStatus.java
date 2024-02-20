@@ -8,13 +8,4 @@ public enum BookingStatus {
     PAST,
     REJECTED,
     WAITING;
-
-    static BookingStatus from(String state) {
-        for (BookingStatus value : BookingStatus.values()) {
-            if (value.name().equals(state)) {
-                return value;
-            }
-        }
-        return null;
-    }
 }

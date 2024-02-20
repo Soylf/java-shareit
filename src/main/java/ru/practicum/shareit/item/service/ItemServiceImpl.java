@@ -44,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto addItem(ItemDto itemDto, Long userId) {
         try {
             User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+                    .orElseThrow(() -> new BadRequestException("пользователя: " + userId + "  нет"));
 
             itemDto.setOwner(user);
             return itemMapper.fromItem(itemRepository.save(itemMapper.fromDto(itemDto)));
@@ -109,7 +109,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("Предмета с ID " + itemId + " не существует"));
         List<CommentDto> comments = commentMapper.toListComment(commentRepository.findAllByItemIdOrderByCreatedDesc(itemId));
-        ItemDto itemDto = itemMapper.toItemDtoAndCommits(item, null, null, comments);
+        ItemDto itemDto = itemMapper.toItemResponseDto(item, null, null, comments);
 
 
         if (!item.getOwner().getId().equals(userId)) {
@@ -145,13 +145,9 @@ public class ItemServiceImpl implements ItemService {
         for (Item item : items) {
             List<CommentDto> comments = commentMapper
                     .toListComment(commentRepository.findAllByItemIdOrderByCreatedDesc(item.getId()));
-
-            Booking lastBooking = bookingRepository.findFirstByItem_idAndEndBeforeOrderByEndDesc(item.getId(), LocalDateTime.now());
-            Booking nextBooking = bookingRepository.findFirstByItem_idAndStartAfterOrderByStartAsc(item.getId(), LocalDateTime.now());
-
-            itemDos.add(itemMapper.toItemDtoAndCommits(item,
-                    lastBooking != null ? bookingMapper.fromBooking(lastBooking) : null,
-                    nextBooking != null ? bookingMapper.fromBooking(nextBooking) : null,
+            itemDos.add(itemMapper.toItemResponseDto(item,
+                    bookingRepository.findFirstByItem_idAndEndBeforeOrderByEndDesc(item.getId(), LocalDateTime.now()),
+                    bookingRepository.findFirstByItem_idAndStartAfterOrderByStartAsc(item.getId(), LocalDateTime.now()),
                     comments));
         }
 

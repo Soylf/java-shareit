@@ -5,9 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
-import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.server.BookingService;
-import ru.practicum.shareit.error.exception.EntityNotFoundException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -48,16 +46,16 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDto> getUserBookings(@RequestHeader("X-Sharer-User-Id") long userId,
-                                            @RequestParam(required = false, defaultValue = "ALL") BookingStatus state) {
+    public List<BookingDto> getAllUser(@RequestHeader("X-Sharer-User-Id") long userId,
+                                            @RequestParam(required = false, defaultValue = "ALL") String state) {
         log.info("Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
-        return service.getUserBookings(userId,state);
+        return service.getAllUser(userId,state);
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getUserItemsBooked(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                @RequestParam(required = false, defaultValue = "ALL") BookingStatus state) throws EntityNotFoundException {
+    public List<BookingDto> getAllOwner(@RequestHeader("X-Sharer-User-Id") long userId,
+                                               @RequestParam(required = false, defaultValue = "ALL") String state) {
         log.info("(owner)Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
-        return service.getUserItemsBooked(userId,state);
+        return service.getAllOwner(userId,state);
     }
 }
