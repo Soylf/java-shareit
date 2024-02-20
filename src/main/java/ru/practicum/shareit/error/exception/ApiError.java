@@ -25,4 +25,7 @@ public class ApiError {
 
     public ApiError(String message) {
     }
+
+    public ApiError(String message, StackTraceElement[] stackTrace) {
+    }
 }

@@ -16,28 +16,28 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFoundException(final EntityNotFoundException e) {
         log.info("404 {}", e.getMessage());
-        return new ApiError(e.getMessage());
+        return new ApiError(e.getMessage(),e.getStackTrace());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ApiError handleBadRequestExceptionEx(final BadRequestException e) {
         log.info("400 {}", e.getMessage());
-        return new ApiError(e.getMessage());
+        return new ApiError(e.getMessage(), e.getStackTrace());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected ApiError handleThrowable(final Throwable e) {
         log.info("500 {}", e.getMessage());
-        return new ApiError(e.getMessage());
+        return new ApiError(e.getMessage(), e.getStackTrace());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     protected ApiError handleBadConflictException(final BadConflictException e) {
         log.info("409 {}", e.getMessage());
-        return new ApiError(e.getMessage());
+        return new ApiError(e.getMessage(), e.getStackTrace());
     }
 
     @ExceptionHandler
