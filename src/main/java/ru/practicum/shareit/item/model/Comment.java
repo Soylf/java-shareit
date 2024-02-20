@@ -28,7 +28,7 @@ public class Comment {
     @ManyToOne(optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Item item;
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "author_id")
     @ManyToOne(optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User author;

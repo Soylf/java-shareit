@@ -109,8 +109,10 @@ public class ItemServiceImpl implements ItemService {
         }
 
 
-        List<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndEndBeforeAndBookingStatusOrderByEndDesc(itemId, LocalDateTime.now(), BookingStatus.APPROVED);
-        List<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndEndAfterAndBookingStatusOrderByEndAsc(itemId, LocalDateTime.now(), BookingStatus.APPROVED);
+        List<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndEndBeforeAndBookingStatusOrderByEndDesc(itemId,
+                LocalDateTime.now(), BookingStatus.APPROVED);
+        List<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndEndAfterAndBookingStatusOrderByEndAsc(itemId,
+                LocalDateTime.now(), BookingStatus.APPROVED);
 
         if (!lastBooking.isEmpty() && !nextBooking.isEmpty()) {
             itemDto.setLastBooking(bookingMapper.fromBookingDto(lastBooking.get(0)));
@@ -134,7 +136,8 @@ public class ItemServiceImpl implements ItemService {
 
         for (Item item : items) {
             List<CommentResponseDto> comments = commentMapper.toListComment(commentRepository.findAllByItemIdOrderByCreatedDesc(item.getId()));
-            itemDos.add(itemMapper.toItemResponseDto(item, bookingRepository.findFirstByItem_idAndEndBeforeOrderByEndDesc(item.getId(), LocalDateTime.now()), bookingRepository.findFirstByItem_idAndStartAfterOrderByStartAsc(item.getId(), LocalDateTime.now()), comments));
+            itemDos.add(itemMapper.toItemResponseDto(item, bookingRepository.findFirstByItem_idAndEndBeforeOrderByEndDesc(item.getId(),
+                    LocalDateTime.now()), bookingRepository.findFirstByItem_idAndStartAfterOrderByStartAsc(item.getId(), LocalDateTime.now()), comments));
         }
 
         return itemDos;
