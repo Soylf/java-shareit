@@ -24,8 +24,10 @@ public class ApiError {
     }
 
     public ApiError(String message) {
+        this.message = message;
     }
 
     public ApiError(String message, StackTraceElement[] stackTrace) {
+        this.message = message;
     }
 }
