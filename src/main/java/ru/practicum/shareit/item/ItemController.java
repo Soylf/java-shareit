@@ -47,7 +47,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable("itemId") Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ItemDto getItem(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получен запрос на поулчение обьекта под номер " + itemId + " от " + userId);
         return service.getItem(itemId,userId).orElse(null);
     }
