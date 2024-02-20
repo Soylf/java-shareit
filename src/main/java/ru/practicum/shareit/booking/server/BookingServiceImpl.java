@@ -62,14 +62,14 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("брони: " + userId + "  нет"));
 
-        if (booking.getBookingStatus() != BookingStatus.WAITING) {
-            throw new EntityNotFoundException("Статус брони должен быть в ожидании - 'WAITING', другой статус подтвердить невозможно");
-        }
         if (booking.getBooker().getId().equals(userId)) {
             throw new EntityNotFoundException("Только владелец вещи может подтвердить бронирование");
         }
         if (!booking.getItem().getOwner().getId().equals(userId)) {
-            throw new EntityNotFoundException("Только владелец вещи может подтвердить бронирование");
+            throw new BadRequestException("Только владелец вещи может подтвердить бронирование(Owner)");
+        }
+        if (booking.getBookingStatus() != BookingStatus.WAITING) {
+            throw new BadRequestException("Статус брони должен быть в ожидании - 'WAITING', другой статус подтвердить невозможно");
         }
 
         booking.setBookingStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);

@@ -20,16 +20,16 @@ import java.util.List;
 @Builder
 public class ItemDto {
     private Long id;
-    @NotNull(message = "user не может быть пустым")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User owner;
     @NotBlank(message = "Неверное название")
     private String name;
+    @NotBlank
     @Size(max = 512, message = "Описание не должно превышать 512 символов")
     private String description;
     @NotNull(message = "available не может быть пустым")
     private Boolean available;
-    private BookingResponseDto lastBookingDate;
-    private BookingResponseDto nextBookingDate;
-    private List<CommentDto> commentDos;
+    private BookingResponseDto lastBooking;
+    private BookingResponseDto nextBooking;
+    private List<CommentResponseDto> comments;
 }

@@ -3,7 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -25,15 +25,15 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestBody ItemDto itemDto,
+    public ItemDto createItem(@Valid @RequestBody ItemDto itemDto,
                            @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получен запрос на добавление пользователя : {}.", itemDto);
         return service.addItem(itemDto, userId);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
-                                 @Valid @RequestBody CommentDto commentDto) {
+    public CommentResponseDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
+                                         @Valid @RequestBody CommentResponseDto commentDto) {
         log.info("Получен запрос на создания комита к придмета под номером " + itemId + " от " + userId + " с таким вот содержанием {}", commentDto);
         return service.addComment(commentDto,itemId,userId);
     }

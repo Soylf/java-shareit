@@ -9,10 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findTop1BookingByItemIdAndEndIsBeforeAndBookingStatusIs(Long itemId, LocalDateTime now, BookingStatus approved, Sort end);
 
     List<Booking> findTop1BookingByItemIdAndEndIsAfterAndBookingStatusIs(Long itemId, LocalDateTime now, BookingStatus approved, Sort end);
-
     Booking findFirstByItem_idAndEndBeforeOrderByEndDesc(Long id, LocalDateTime now);
 
     Booking findFirstByItem_idAndStartAfterOrderByStartAsc(Long id, LocalDateTime now);
@@ -37,4 +35,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByItemOwnerIdAndStartIsAfterOrderByStartDesc(long ownerId, LocalDateTime now);
 
     List<Booking> findByItemOwnerIdAndBookingStatusOrderByStartDesc(long ownerId, BookingStatus rejected);
+
+    List<Booking> findTop1BookingByItemIdAndEndIsBeforeAndBookingStatusIs(Long itemId, LocalDateTime now, BookingStatus approved, Sort end);
 }
