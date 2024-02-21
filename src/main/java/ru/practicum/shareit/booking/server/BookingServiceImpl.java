@@ -31,11 +31,14 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto create(long userId, BookingRequestDto bookingRequestDto) {
-        User booker = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+        User booker = getUser(userId);
+        Item item = getItem(bookingRequestDto.getItemId());
 
-        Item item = itemRepository.findById(bookingRequestDto.getItemId())
-                .orElseThrow(() -> new EntityNotFoundException("предмета: " + bookingRequestDto.getItemId() + "  нет"));
+        if (bookingRequestDto.getStart().isAfter(bookingRequestDto.getEnd())
+                || bookingRequestDto.getStart().equals(bookingRequestDto.getEnd())
+                || bookingRequestDto.getEnd().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Время бронирования неверное");
+        }
 
         if (!item.getAvailable()) {
             throw new BadRequestException("Вещь недоступна для бронирования");
@@ -43,12 +46,6 @@ public class BookingServiceImpl implements BookingService {
 
         if (item.getOwner().getId().equals(userId)) {
             throw new EntityNotFoundException("Вы не можете бронировать свою вещь");
-        }
-
-        if (bookingRequestDto.getStart().isAfter(bookingRequestDto.getEnd())
-                || bookingRequestDto.getStart().equals(bookingRequestDto.getEnd())
-                || bookingRequestDto.getEnd().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("Время бронирования неверное");
         }
 
         Booking booking = mapper.toBookerTo(bookingRequestDto, booker, item, BookingStatus.WAITING);
@@ -60,8 +57,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto updateStatus(long userId, Long bookingId, Boolean approved) {
         checkUser(userId);
 
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityNotFoundException("брони: " + userId + "  нет"));
+        Booking booking = getBooking(bookingId);
 
         if (booking.getBooker().getId().equals(userId)) {
             throw new EntityNotFoundException("Только владелец вещи может подтвердить бронирование");
@@ -81,10 +77,8 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto getBooking(long userId, Long bookingId) {
         checkUser(userId);
 
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityNotFoundException("брони: " + bookingId + "  нет"));
-        Item item = itemRepository.findById(booking.getItem().getId())
-                .orElseThrow(() -> new EntityNotFoundException("придмета: " + booking.getItem().getId() + "  нет"));
+        Booking booking = getBooking(bookingId);
+        Item item = getItem(booking.getItem().getId());
 
         if (!item.getOwner().getId().equals(userId) && !booking.getBooker().getId().equals(userId)) {
             throw new EntityNotFoundException("не найден пользователь: " + userId + " и бронь: " + bookingId);
@@ -98,23 +92,23 @@ public class BookingServiceImpl implements BookingService {
         checkState(state);
 
         List<Booking> bookings;
-        switch (state.toUpperCase()) {
-            case "ALL":
+        switch (BookingStatus.convert(state)) {
+            case ALL:
                 bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId);
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookings = bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(ownerId, LocalDateTime.now(), LocalDateTime.now());
                 break;
-            case "PAST":
+            case PAST:
                 bookings = bookingRepository.findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(ownerId, LocalDateTime.now());
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookings = bookingRepository.findByItemOwnerIdAndStartIsAfterOrderByStartDesc(ownerId, LocalDateTime.now());
                 break;
-            case "WAITING":
+            case WAITING:
                 bookings = bookingRepository.findByItemOwnerIdAndBookingStatusOrderByStartDesc(ownerId, BookingStatus.WAITING);
                 break;
-            case "REJECTED":
+            case REJECTED:
                 bookings = bookingRepository.findByItemOwnerIdAndBookingStatusOrderByStartDesc(ownerId, BookingStatus.REJECTED);
                 break;
             default:
@@ -130,23 +124,23 @@ public class BookingServiceImpl implements BookingService {
         checkState(state);
 
         List<Booking> bookings;
-        switch (state.toUpperCase()) {
-            case "ALL":
+        switch (BookingStatus.convert(state)) {
+            case ALL:
                 bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookings = bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId, LocalDateTime.now(), LocalDateTime.now());
                 break;
-            case "PAST":
+            case PAST:
                 bookings = bookingRepository.findAllByBooker_IdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now());
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookings = bookingRepository.findAllByBooker_IdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now());
                 break;
-            case "WAITING":
+            case WAITING:
                 bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.WAITING);
                 break;
-            case "REJECTED":
+            case REJECTED:
                 bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.REJECTED);
                 break;
             default:
@@ -165,11 +159,27 @@ public class BookingServiceImpl implements BookingService {
 
     private void checkState(String state) {
         BookingStatus[] values = BookingStatus.values();
-        for (BookingStatus val: values) {
+        for (BookingStatus val : values) {
             if (state.equals(val.name())) {
                 return;
             }
         }
         throw new NoEnumValueArgumentException(("Unknown state: " + state));
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+    }
+
+    private Item getItem(Long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("придмета: " + itemId + "  нет"));
+
+    }
+
+    private Booking getBooking(Long bookingId) {
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("брони: " + bookingId + "  нет"));
     }
 }

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,14 +47,14 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAllUser(@RequestHeader("X-Sharer-User-Id") long userId,
-                                       @RequestParam(required = false, defaultValue = "ALL") String state) {
+                                       @RequestParam(defaultValue = "ALL") String state) {
         log.info("Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
         return service.getAllUser(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllOwner(@RequestHeader("X-Sharer-User-Id") long userId,
-                                        @RequestParam(required = false, defaultValue = "ALL") String state) {
+                                        @RequestParam(defaultValue = "ALL") String state) {
         log.info("(owner)Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
         return service.getAllOwner(userId, state);
     }

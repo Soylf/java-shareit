@@ -1,10 +1,11 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
+
 import javax.validation.Valid;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@RequestBody UserDto userDto, @PathVariable("userId") Long id) {
+    public UserDto update(@Valid @RequestBody UserDto userDto, @PathVariable("userId") Long id) {
         log.info("Запуск метода updateUser вот с такими данными: \n" + userDto);
         return service.update(userDto, id);
     }

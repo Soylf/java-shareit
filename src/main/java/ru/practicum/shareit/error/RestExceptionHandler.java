@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.practicum.shareit.error.exception.*;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Arrays;
 
 @Slf4j
@@ -21,7 +19,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ApiError handleNotFoundException(final EntityNotFoundException e) {
         log.info("404 {}", e.getMessage());
         System.out.println(Arrays.toString(e.getStackTrace()));
-        return new ApiError(e.getMessage(), getStackTraceAsString(e));
+        return new ApiError(e.getMessage(), e.getStackTrace());
     }
 
     @ExceptionHandler
@@ -29,7 +27,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ApiError handleBadRequestExceptionEx(final BadRequestException e) {
         log.info("400 {}", e.getMessage());
         System.out.println(Arrays.toString(e.getStackTrace()));
-        return new ApiError(e.getMessage(), getStackTraceAsString(e));
+        return new ApiError(e.getMessage(), e.getStackTrace());
     }
 
     @ExceptionHandler
@@ -42,10 +40,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    protected ApiError handleBadConflictException(final BadConflictException e) {
+    protected ApiError handleConflictException(final ConflictException e) {
         log.info("409 {}", e.getMessage());
         System.out.println(Arrays.toString(e.getStackTrace()));
-        return new ApiError(e.getMessage(), getStackTraceAsString(e));
+        return new ApiError(e.getMessage(), e.getStackTrace());
     }
 
     @ExceptionHandler
@@ -55,11 +53,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         System.out.println(Arrays.toString(e.getStackTrace()));
         return new ApiError("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
     }
-
-    private String getStackTraceAsString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleThrowable(final ValidationException e) {
+        log.info("400 {}", e.getMessage());
+        System.out.println(Arrays.toString(e.getStackTrace()));
+        return new ErrorResponse(e.getMessage(), e.getMessage());
     }
+
 }

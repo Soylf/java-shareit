@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS bookings (
         end_date TIMESTAMP WITH TIME ZONE NOT NULL,
         item_id             BIGINT REFERENCES items (id) ON DELETE CASCADE NOT NULL,
         booker_id           BIGINT REFERENCES users (id) ON DELETE CASCADE NOT NULL,
-        status VARCHAR(10)
+        status VARCHAR(10) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS comments (
