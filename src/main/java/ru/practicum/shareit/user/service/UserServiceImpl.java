@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
             User update = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID " + userId + " не существует"));
 
+            //Проверка на наличие
             if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
                 update.setEmail(userDto.getEmail());
             }

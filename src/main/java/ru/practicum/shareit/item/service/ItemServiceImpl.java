@@ -45,7 +45,8 @@ public class ItemServiceImpl implements ItemService {
             throw new EntityNotFoundException("Такого пользователя нет");
         }
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
 
         itemDto.setOwner(user);
         return itemMapper.fromItem(itemRepository.save(itemMapper.fromDto(itemDto)));
@@ -53,11 +54,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentResponseDto addComment(CommentResponseDto commentResponseDto, Long itemId, Long userId) {
-        Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException("Обьект: " + userId + "  нет"));
-
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("Обьект: " + userId + "  нет"));
+        User user = userRepository
+                .findById(userId).orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
 
         List<Booking> bookings = bookingRepository.findByItem_IdAndBooker_IdOrderByStartDesc(itemId, userId);
+
 
         if (!bookings.isEmpty()) {
             boolean hasActiveBooking = bookings.stream().anyMatch(booking -> booking.getBookingStatus() != BookingStatus.REJECTED && booking.getBookingStatus() != BookingStatus.WAITING && booking.getEnd().isBefore(LocalDateTime.now()));
@@ -80,7 +83,7 @@ public class ItemServiceImpl implements ItemService {
         try {
             Item item = itemRepository.findById(itemId).orElseThrow(() -> new EntityNotFoundException(("обьекта: " + itemId + " нет")));
 
-
+            //Проверка на наличие
             if (itemDto.getName() != null) {
                 item.setName(itemDto.getName());
             }
@@ -108,7 +111,7 @@ public class ItemServiceImpl implements ItemService {
             return Optional.of(itemDto);
         }
 
-
+        //Выведение последних и слудующих броней с дальнейшим употреблением
         List<Booking> lastBooking = bookingRepository.findTop1BookingByItemIdAndEndBeforeAndBookingStatusOrderByEndDesc(itemId,
                 LocalDateTime.now(), BookingStatus.APPROVED);
         List<Booking> nextBooking = bookingRepository.findTop1BookingByItemIdAndEndAfterAndBookingStatusOrderByEndAsc(itemId,
@@ -153,6 +156,7 @@ public class ItemServiceImpl implements ItemService {
 
     //Дополнительные методы
     private void checkUser(long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+        userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
     }
 }
