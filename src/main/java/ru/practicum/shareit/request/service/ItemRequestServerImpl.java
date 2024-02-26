@@ -48,5 +48,4 @@ public class ItemRequestServerImpl implements ItemRequestServer {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
     }
-
 }
