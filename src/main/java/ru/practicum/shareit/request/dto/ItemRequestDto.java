@@ -25,5 +25,5 @@ public class ItemRequestDto {
     private String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime created;
-    private User requester;
+    private Long requesterId;
 }
