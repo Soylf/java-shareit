@@ -40,6 +40,11 @@ public class ItemRequestMapper {
                 .collect(Collectors.toList());
     }
 
+    public List<ItemRequest> toItemRequests(List<ItemRequestDto> itemRequestDtos) {
+        return itemRequestDtos.stream()
+                .map(this::fromItemRequest)
+                .collect(Collectors.toList());
+    }
     public User getUser(Long userId) {
         return repository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));

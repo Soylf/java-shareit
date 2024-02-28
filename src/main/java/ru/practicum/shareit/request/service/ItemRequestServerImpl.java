@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,6 +27,7 @@ public class ItemRequestServerImpl implements ItemRequestServer {
         checkUser(userId);
 
         itemRequestDto.setRequesterId(userId);
+        itemRequestDto.setCreated(LocalDateTime.now());
         return mapper.fromItemRequestDto(repository.save(mapper.fromItemRequest(itemRequestDto)));
     }
 
@@ -52,10 +54,12 @@ public class ItemRequestServerImpl implements ItemRequestServer {
     @Override
     public ItemRequestDto getById(Long userId, Long requestId) {
         checkUser(userId);
+        ItemRequestDto itemRequestDto = mapper.fromItemRequestDto(getItemRequest(requestId));
 
+        List<ItemRequestDto> itemRequestDtoList = getAllByUser(0,itemRequestDto.getRequests().size(), userId);
 
-        ItemRequest itemRequest = getItemRequest(requestId);
-        return null;
+        itemRequestDto.setRequests(mapper.toItemRequests(itemRequestDtoList));
+        return itemRequestDto;
     }
 
     //Дополнительные методы

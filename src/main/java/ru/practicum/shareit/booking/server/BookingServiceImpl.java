@@ -87,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllOwner(long ownerId, String state) {
+    public List<BookingDto> getAllOwner(long ownerId, String state, int from, int size) {
         checkUser(ownerId);
         checkState(state);
 
@@ -119,7 +119,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllUser(long userId, String state) {
+    public List<BookingDto> getAllUser(long userId, String state, int from, int size) {
         checkUser(userId);
         checkState(state);
 

@@ -26,7 +26,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto createItem(@Valid @RequestBody ItemDto itemDto,
-                           @RequestHeader("X-Sharer-User-Id") Long userId) {
+                              @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получен запрос на добавление пользователя : {}.", itemDto);
         return service.addItem(itemDto, userId);
     }
@@ -35,7 +35,7 @@ public class ItemController {
     public CommentResponseDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
                                          @Valid @RequestBody CommentResponseDto commentDto) {
         log.info("Получен запрос на создания комита к придмета под номером " + itemId + " от " + userId + " с таким вот содержанием {}", commentDto);
-        return service.addComment(commentDto,itemId,userId);
+        return service.addComment(commentDto, itemId, userId);
     }
 
     @PatchMapping("/{itemId}")
@@ -49,18 +49,22 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ItemDto getItem(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получен запрос на поулчение обьекта под номер " + itemId + " от " + userId);
-        return service.getItem(itemId,userId).orElse(null);
+        return service.getItem(itemId, userId).orElse(null);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemDto> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                    @RequestParam(defaultValue = "0") int from,
+                                    @RequestParam(defaultValue = "10") int size) {
         log.info("Получен запрос на поулчение всех придметов у пользовтаеля " + userId);
-        return service.getAllItem(userId);
+        return service.getAllItem(userId,from,size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam("text") String text) {
+    public List<ItemDto> searchItem(@RequestParam("text") String text,
+                                    @RequestParam(defaultValue = "0") int from,
+                                    @RequestParam(defaultValue = "10") int size) {
         log.info("Получен запрос на поиск придмета: " + text);
-        return service.searchItem(text);
+        return service.searchItem(text,from,size);
     }
 }

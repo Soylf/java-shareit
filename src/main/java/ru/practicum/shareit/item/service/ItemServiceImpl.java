@@ -17,6 +17,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -33,6 +35,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final ItemRequestRepository requestRepository;
     private final CommentRepository commentRepository;
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
@@ -93,6 +96,9 @@ public class ItemServiceImpl implements ItemService {
             if (itemDto.getAvailable() != null) {
                 item.setAvailable(itemDto.getAvailable());
             }
+            if (itemDto.getRequestId() != null) {
+                item.setRequest(getItemRequest(itemDto.getRequestId()));
+            }
 
             return itemMapper.fromItem(itemRepository.save(item));
         } catch (DataIntegrityViolationException e) {
@@ -129,7 +135,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllItem(Long userId) {
+    public List<ItemDto> getAllItem(Long userId, int from, int size) {
         List<ItemDto> itemDos = new ArrayList<>();
         List<Item> items = itemRepository.findItemsByOwnerIdOrderByIdAsc(userId);
 
@@ -137,7 +143,9 @@ public class ItemServiceImpl implements ItemService {
             throw new EntityNotFoundException("Такого пользователя нет");
         }
 
-        for (Item item : items) {
+        int endIndex = Math.min(from + size, items.size());
+        for (int i = from; i < endIndex; i++) {
+            Item item = items.get(i);
             List<CommentResponseDto> comments = commentMapper.toListComment(commentRepository.findAllByItemIdOrderByCreatedDesc(item.getId()));
             itemDos.add(itemMapper.toItemResponseDto(item, bookingRepository.findFirstByItem_idAndEndBeforeOrderByEndDesc(item.getId(),
                     LocalDateTime.now()), bookingRepository.findFirstByItem_idAndStartAfterOrderByStartAsc(item.getId(), LocalDateTime.now()), comments));
@@ -147,16 +155,33 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItem(String text) {
+    public List<ItemDto> searchItem(String text, int from, int size) {
         if (text == null || text.isBlank()) {
             return List.of();
         }
-        return itemMapper.toItemDos(itemRepository.search(text));
+
+        int endIndex = from + size;
+
+        List<ItemDto> searchResults = itemMapper.toItemDos(itemRepository.search(text));
+
+        if (from >= searchResults.size()) {
+            return List.of();
+        }
+
+        if (endIndex > searchResults.size()) {
+            endIndex = searchResults.size();
+        }
+
+        return searchResults.subList(from, endIndex);
     }
 
     //Дополнительные методы
     private void checkUser(long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+    }
+    private ItemRequest getItemRequest(Long requestId) {
+        return requestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException("Необнаруженно: " + requestId + "  нет"));
     }
 }

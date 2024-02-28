@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS items (
         owner_id            BIGINT REFERENCES users (id) ON DELETE CASCADE NOT NULL,
         name                VARCHAR(255) NOT NULL,
         description         VARCHAR(512) NOT NULL,
+        request_id          BIGINT REFERENCES requests (id) ON DELETE CASCADE,
         is_available        BOOLEAN
 );
 
