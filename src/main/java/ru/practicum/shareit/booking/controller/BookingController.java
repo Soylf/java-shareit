@@ -8,6 +8,8 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.server.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
@@ -48,8 +50,8 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getAllUser(@RequestHeader("X-Sharer-User-Id") long userId,
                                        @RequestParam(defaultValue = "ALL") String state,
-                                       @RequestParam(defaultValue = "0") int from,
-                                       @RequestParam(defaultValue = "10") int size) {
+                                       @RequestParam(defaultValue = "0") @Min(0) int from,
+                                       @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
         log.info("Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
         return service.getAllUser(userId, state,from,size);
     }
@@ -57,8 +59,8 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDto> getAllOwner(@RequestHeader("X-Sharer-User-Id") long userId,
                                         @RequestParam(defaultValue = "ALL") String state,
-                                        @RequestParam(defaultValue = "0") int from,
-                                        @RequestParam(defaultValue = "10") int size) {
+                                        @RequestParam(defaultValue = "0") @Min(0) int from,
+                                        @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
         log.info("(owner)Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
         return service.getAllOwner(userId, state,from,size);
     }

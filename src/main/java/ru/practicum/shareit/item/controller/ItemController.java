@@ -8,6 +8,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
@@ -54,16 +56,16 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                    @RequestParam(defaultValue = "0") int from,
-                                    @RequestParam(defaultValue = "10") int size) {
+                                    @RequestParam(defaultValue = "0") @Min(0) int from,
+                                    @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
         log.info("Получен запрос на поулчение всех придметов у пользовтаеля " + userId);
         return service.getAllItem(userId,from,size);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItem(@RequestParam("text") String text,
-                                    @RequestParam(defaultValue = "0") int from,
-                                    @RequestParam(defaultValue = "10") int size) {
+                                    @RequestParam(defaultValue = "0") @Min(0) int from,
+                                    @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
         log.info("Получен запрос на поиск придмета: " + text);
         return service.searchItem(text,from,size);
     }

@@ -91,6 +91,8 @@ public class BookingServiceImpl implements BookingService {
         checkUser(ownerId);
         checkState(state);
 
+        int offset = (from - 1) * size;
+
         List<Booking> bookings;
         switch (BookingStatus.convert(state)) {
             case ALL:
@@ -115,13 +117,15 @@ public class BookingServiceImpl implements BookingService {
                 throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
         }
 
-        return mapper.toBookingTo(bookings);
+        return mapper.toBookingTo(bookings.subList(offset, Math.min(offset + size, bookings.size())));
     }
 
     @Override
     public List<BookingDto> getAllUser(long userId, String state, int from, int size) {
         checkUser(userId);
         checkState(state);
+
+        int offset = (from - 1) * size;
 
         List<Booking> bookings;
         switch (BookingStatus.convert(state)) {
@@ -147,7 +151,7 @@ public class BookingServiceImpl implements BookingService {
                 throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
         }
 
-        return mapper.toBookingTo(bookings);
+        return mapper.toBookingTo(bookings.subList(offset, Math.min(offset + size, bookings.size())));
     }
 
 
