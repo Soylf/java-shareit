@@ -30,6 +30,6 @@ public class ItemRequest {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.EAGER)
     private User requester;
-    @Column(name = "created")
+    @Column(name = "created", columnDefinition = "timestamp")
     private LocalDateTime created;
 }

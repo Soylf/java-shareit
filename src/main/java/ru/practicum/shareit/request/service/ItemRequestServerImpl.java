@@ -3,6 +3,10 @@ package ru.practicum.shareit.request.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -21,20 +25,24 @@ public class ItemRequestServerImpl implements ItemRequestServer {
     private final ItemRequestRepository repository;
     private final UserRepository userRepository;
     private final ItemRequestMapper mapper;
+    private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
 
     @Override
     public ItemRequestDto create(Long userId, ItemRequestDto itemRequestDto) {
         checkUser(userId);
 
-        itemRequestDto.setRequesterId(userId);
-        itemRequestDto.setCreated(LocalDateTime.now());
-        return mapper.fromItemRequestDto(repository.save(mapper.fromItemRequest(itemRequestDto)));
+        itemRequestDto.setRequester(getUser(userId));
+        return mapper.fromItemRequestDto(repository.save(mapper.fromItemRequest(itemRequestDto,userId)));
     }
 
     @Override
     public List<ItemRequestDto> getAll(Long userId) {
         User user = getUser(userId);
-        return mapper.toItemRequestDto(repository.findAllByRequesterOrderByCreatedAsc(user));
+
+        List<ItemRequestDto> requests = mapper.toItemRequestDto(repository.findAllByRequesterOrderByCreatedAsc(user));
+        requests.forEach(requestDto -> requestDto.setItems(findAllByRequest(requestDto.getId())));
+        return requests;
     }
 
     @Override
@@ -56,10 +64,7 @@ public class ItemRequestServerImpl implements ItemRequestServer {
         checkUser(userId);
         ItemRequestDto itemRequestDto = mapper.fromItemRequestDto(getItemRequest(requestId));
 
-        List<ItemRequestDto> itemRequestDtoList = getAllByUser(0,itemRequestDto.getRequests().size(), userId);
-
-        itemRequestDto.setRequests(mapper.toItemRequests(itemRequestDtoList));
-        return itemRequestDto;
+        return null;
     }
 
     //Дополнительные методы
@@ -76,5 +81,9 @@ public class ItemRequestServerImpl implements ItemRequestServer {
     private void checkUser(Long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+    }
+
+    private List<ItemDto> findAllByRequest(Long requestId) {
+        return itemMapper.toItemDos(itemRepository.findAllByRequestId(requestId));
     }
 }

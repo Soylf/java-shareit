@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 public class ItemRequestMapper {
     private final UserRepository repository;
 
-    public ItemRequest fromItemRequest(ItemRequestDto itemRequestDto) {
+    public ItemRequest fromItemRequest(ItemRequestDto itemRequestDto, Long userId) {
         return ItemRequest.builder()
                 .id(itemRequestDto.getId())
                 .description(itemRequestDto.getDescription())
-                .requester(getUser(itemRequestDto.getRequesterId()))
+                .requester(getUser(userId))
                 .created(itemRequestDto.getCreated())
                 .build();
     }
@@ -29,7 +29,7 @@ public class ItemRequestMapper {
         return ItemRequestDto.builder()
                 .id(itemRequest.getId())
                 .description(itemRequest.getDescription())
-                .requesterId(itemRequest.getRequester().getId())
+                .requester(getUser(itemRequest.getRequester().getId()))
                 .created(itemRequest.getCreated())
                 .build();
     }
@@ -40,11 +40,6 @@ public class ItemRequestMapper {
                 .collect(Collectors.toList());
     }
 
-    public List<ItemRequest> toItemRequests(List<ItemRequestDto> itemRequestDtos) {
-        return itemRequestDtos.stream()
-                .map(this::fromItemRequest)
-                .collect(Collectors.toList());
-    }
     public User getUser(Long userId) {
         return repository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
