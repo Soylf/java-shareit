@@ -26,7 +26,7 @@ public class ItemRequestController {
     @PostMapping
     public ItemRequestDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
                                  @Valid @RequestBody ItemRequestDto itemRequestDto) {
-        return server.create(userId,itemRequestDto);
+        return server.create(userId, itemRequestDto);
     }
 
     @GetMapping
@@ -40,12 +40,12 @@ public class ItemRequestController {
             @RequestHeader("X-Sharer-User-Id") long userId,
             @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "10") int size) {
-        return server.getAllByUser(from,size,userId);
+        return server.getAllByUser(from, size, userId);
     }
 
     @GetMapping("/{requestId}")
     public ItemRequestDto getItemRequestDtoByUser(@PathVariable Long requestId,
                                                   @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return server.getById(userId,requestId);
+        return server.getById(userId, requestId);
     }
 }

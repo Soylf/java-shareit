@@ -59,7 +59,7 @@ public class ItemController {
                                     @RequestParam(defaultValue = "0") @Min(0) int from,
                                     @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
         log.info("Получен запрос на поулчение всех придметов у пользовтаеля " + userId);
-        return service.getAllItem(userId,from,size);
+        return service.getAllItem(userId, from, size);
     }
 
     @GetMapping("/search")
@@ -67,6 +67,6 @@ public class ItemController {
                                     @RequestParam(defaultValue = "0") @Min(0) int from,
                                     @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
         log.info("Получен запрос на поиск придмета: " + text);
-        return service.searchItem(text,from,size);
+        return service.searchItem(text, from, size);
     }
 }

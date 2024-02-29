@@ -53,7 +53,7 @@ public class BookingController {
                                        @RequestParam(defaultValue = "0") @Min(0) int from,
                                        @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
         log.info("Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
-        return service.getAllUser(userId, state,from,size);
+        return service.getAllUser(userId, state, from, size);
     }
 
     @GetMapping("/owner")
@@ -62,6 +62,6 @@ public class BookingController {
                                         @RequestParam(defaultValue = "0") @Min(0) int from,
                                         @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
         log.info("(owner)Получен запрос на получение брони от " + userId + " с таким вот статусом " + state);
-        return service.getAllOwner(userId, state,from,size);
+        return service.getAllOwner(userId, state, from, size);
     }
 }

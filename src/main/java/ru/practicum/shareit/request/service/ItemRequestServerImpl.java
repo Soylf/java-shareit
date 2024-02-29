@@ -6,7 +6,6 @@ import ru.practicum.shareit.error.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -15,7 +14,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -33,7 +31,7 @@ public class ItemRequestServerImpl implements ItemRequestServer {
         checkUser(userId);
 
         itemRequestDto.setRequester(getUser(userId));
-        return mapper.fromItemRequestDto(repository.save(mapper.fromItemRequest(itemRequestDto,userId)));
+        return mapper.fromItemRequestDto(repository.save(mapper.fromItemRequest(itemRequestDto, userId)));
     }
 
     @Override

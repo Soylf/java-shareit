@@ -180,6 +180,7 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
     }
+
     private ItemRequest getItemRequest(Long requestId) {
         return requestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("Необнаруженно: " + requestId + "  нет"));
