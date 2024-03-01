@@ -46,7 +46,6 @@ public class ItemRequestServerImpl implements ItemRequestServer {
     @Override
     public List<ItemRequestDto> getAllByUser(int from, int size, long userId) {
         User user = getUser(userId);
-
         List<ItemRequest> itemRequests = repository.findAllByRequesterOrderByCreatedAsc(user);
 
         //пагинация
@@ -61,8 +60,8 @@ public class ItemRequestServerImpl implements ItemRequestServer {
     public ItemRequestDto getById(Long userId, Long requestId) {
         checkUser(userId);
         ItemRequestDto itemRequestDto = mapper.fromItemRequestDto(getItemRequest(requestId));
-
-        return null;
+        itemRequestDto.setItems(findAllByRequest(requestId));
+        return itemRequestDto;
     }
 
     //Дополнительные методы

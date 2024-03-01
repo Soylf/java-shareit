@@ -2,6 +2,9 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -136,12 +139,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAllItem(Long userId, int from, int size) {
-        List<ItemDto> itemDos = new ArrayList<>();
-        List<Item> items = itemRepository.findItemsByOwnerIdOrderByIdAsc(userId);
-
         if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException("Такого пользователя нет");
         }
+
+        List<ItemDto> itemDos = new ArrayList<>();
+        Pageable pageable = PageRequest.of(from, size);
+        Page<Item> itemPage = itemRepository.findItemsByOwnerIdOrderByIdAsc(userId, pageable);
+        List<Item> items = itemPage.getContent();
 
         int endIndex = Math.min(from + size, items.size());
         for (int i = from; i < endIndex; i++) {
@@ -160,19 +165,12 @@ public class ItemServiceImpl implements ItemService {
             return List.of();
         }
 
-        int endIndex = from + size;
 
-        List<ItemDto> searchResults = itemMapper.toItemDos(itemRepository.search(text));
+        Pageable pageable = PageRequest.of(from, size);
+        Page<Item> itemPage = itemRepository.search(text, pageable);
+        List<Item> items = itemPage.getContent();
 
-        if (from >= searchResults.size()) {
-            return List.of();
-        }
-
-        if (endIndex > searchResults.size()) {
-            endIndex = searchResults.size();
-        }
-
-        return searchResults.subList(from, endIndex);
+        return itemMapper.toItemDos(items);
     }
 
     //Дополнительные методы
