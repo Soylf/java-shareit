@@ -1,6 +1,9 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -46,12 +49,10 @@ public class ItemRequestServerImpl implements ItemRequestServer {
     @Override
     public List<ItemRequestDto> getAllByUser(int from, int size, long userId) {
         User user = getUser(userId);
-        List<ItemRequest> itemRequests = repository.findAllByRequesterOrderByCreatedAsc(user);
+        Pageable pageable = PageRequest.of(from, size);
+        Page<ItemRequest> itemRequests = repository.findAllByRequesterOrderByCreatedAsc(user, pageable);
+        List<ItemRequest> requests = itemRequests.getContent();
 
-        //пагинация
-        int startIndex = Math.min(from, itemRequests.size());
-        int endIndex = Math.min(from + size, itemRequests.size());
-        List<ItemRequest> requests = itemRequests.subList(startIndex, endIndex);
 
         return mapper.toItemRequestDto(requests);
     }
