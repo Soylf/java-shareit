@@ -1,10 +1,12 @@
 package ru.practicum.shareit.user.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
+
 
 import javax.validation.Valid;
 import java.util.List;
@@ -13,15 +15,11 @@ import java.util.List;
  * TODO Sprint add-controllers.
  */
 @RestController
+@RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
     private final UserService service;
-
-    @Autowired
-    public UserController(UserService service) {
-        this.service = service;
-    }
 
     @PostMapping
     public UserDto create(@Valid @RequestBody UserDto userDto) {
@@ -30,7 +28,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@Valid @RequestBody UserDto userDto, @PathVariable("userId") Long id) {
+    public UserDto update(@RequestBody UserDto userDto, @PathVariable("userId") Long id) {
         log.info("Запуск метода updateUser вот с такими данными: \n" + userDto);
         return service.update(userDto, id);
     }

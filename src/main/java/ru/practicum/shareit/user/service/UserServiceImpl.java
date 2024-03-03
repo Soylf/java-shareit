@@ -12,6 +12,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(UserDto userDto, Long userId) {
+    public UserDto update(@Valid UserDto userDto, Long userId) {
         try {
             User update = userRepository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("Пользователь с ID " + userId + " не существует"));

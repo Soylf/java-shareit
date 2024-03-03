@@ -1,10 +1,17 @@
 package ru.practicum.shareit.user;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 public class UserRepositoryTest {
@@ -24,4 +31,20 @@ public class UserRepositoryTest {
                 .build());
     }
 
+    @Test
+    void existsUserByIdShouldReturnTrue() {
+        List<User> all = userRepository.findAll();
+        assertTrue(userRepository.existsById(all.get(0).getId()));
+    }
+
+    @Test
+    void existsUserByIdShouldReturnFalseWhenUserNotExists() {
+        assertFalse(userRepository.existsById(0L));
+    }
+
+
+    @AfterEach
+    void tearDown() {
+        userRepository.deleteAll();
+    }
 }

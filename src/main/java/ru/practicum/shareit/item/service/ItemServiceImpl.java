@@ -20,6 +20,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -99,7 +100,7 @@ public class ItemServiceImpl implements ItemService {
                 item.setAvailable(itemDto.getAvailable());
             }
             if (itemDto.getRequestId() != null) {
-                item.setRequestId(itemDto.getRequestId());
+                item.setRequest(getRequest(itemDto.getRequestId()));
             }
 
             return itemMapper.fromItem(itemRepository.save(item));
@@ -176,5 +177,10 @@ public class ItemServiceImpl implements ItemService {
     private void checkUser(long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
+    }
+
+    private ItemRequest getRequest(Long id) {
+        return requestRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Обьекта: " + id + "  нет"));
     }
 }

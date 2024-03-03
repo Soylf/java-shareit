@@ -92,33 +92,35 @@ public class BookingServiceImpl implements BookingService {
         checkUser(ownerId);
         checkState(state);
 
-        Pageable pageable = PageRequest.of(from, size);
-        Page<Booking> bookings;
-        switch (BookingStatus.convert(state)) {
-            case ALL:
-                bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId, pageable);
-                break;
-            case CURRENT:
-                bookings = bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(ownerId, LocalDateTime.now(), LocalDateTime.now(), pageable);
-                break;
-            case PAST:
-                bookings = bookingRepository.findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(ownerId, LocalDateTime.now(), pageable);
-                break;
-            case FUTURE:
-                bookings = bookingRepository.findByItemOwnerIdAndStartIsAfterOrderByStartDesc(ownerId, LocalDateTime.now(), pageable);
-                break;
-            case WAITING:
-                bookings = bookingRepository.findByItemOwnerIdAndBookingStatusOrderByStartDesc(ownerId, BookingStatus.WAITING, pageable);
-                break;
-            case REJECTED:
-                bookings = bookingRepository.findByItemOwnerIdAndBookingStatusOrderByStartDesc(ownerId, BookingStatus.REJECTED, pageable);
-                break;
-            default:
-                throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
+        if (from >= 0) {
+            Pageable pageable = PageRequest.of(from / size, size);
+            Page<Booking> bookings;
+            switch (BookingStatus.convert(state)) {
+                case ALL:
+                    bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId, pageable);
+                    break;
+                case CURRENT:
+                    bookings = bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(ownerId, LocalDateTime.now(), LocalDateTime.now(), pageable);
+                    break;
+                case PAST:
+                    bookings = bookingRepository.findByItemOwnerIdAndEndIsBeforeOrderByStartDesc(ownerId, LocalDateTime.now(), pageable);
+                    break;
+                case FUTURE:
+                    bookings = bookingRepository.findByItemOwnerIdAndStartIsAfterOrderByStartDesc(ownerId, LocalDateTime.now(), pageable);
+                    break;
+                case WAITING:
+                    bookings = bookingRepository.findByItemOwnerIdAndBookingStatusOrderByStartDesc(ownerId, BookingStatus.WAITING, pageable);
+                    break;
+                case REJECTED:
+                    bookings = bookingRepository.findByItemOwnerIdAndBookingStatusOrderByStartDesc(ownerId, BookingStatus.REJECTED, pageable);
+                    break;
+                default:
+                    throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
+            }
+            List<Booking> bookingList = bookings.getContent();
+            return mapper.toBookingTo(bookingList);
         }
-
-        List<Booking> bookingList = bookings.getContent();
-        return mapper.toBookingTo(bookingList);
+        throw new BadRequestException("Что то пошло не так");
     }
 
     @Override
@@ -126,33 +128,36 @@ public class BookingServiceImpl implements BookingService {
         checkUser(userId);
         checkState(state);
 
-        Pageable pageable = PageRequest.of(from, size);
-        Page<Booking> bookings;
-        switch (BookingStatus.convert(state)) {
-            case ALL:
-                bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId, pageable);
-                break;
-            case CURRENT:
-                bookings = bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId, LocalDateTime.now(), LocalDateTime.now(), pageable);
-                break;
-            case PAST:
-                bookings = bookingRepository.findAllByBooker_IdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now(), pageable);
-                break;
-            case FUTURE:
-                bookings = bookingRepository.findAllByBooker_IdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now(), pageable);
-                break;
-            case WAITING:
-                bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.WAITING, pageable);
-                break;
-            case REJECTED:
-                bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.REJECTED, pageable);
-                break;
-            default:
-                throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
-        }
+        if (from >= 0) {
+            Pageable pageable = PageRequest.of(from / size, size);
+            Page<Booking> bookings;
+            switch (BookingStatus.convert(state)) {
+                case ALL:
+                    bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId, pageable);
+                    break;
+                case CURRENT:
+                    bookings = bookingRepository.findAllByBooker_IdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId, LocalDateTime.now(), LocalDateTime.now(), pageable);
+                    break;
+                case PAST:
+                    bookings = bookingRepository.findAllByBooker_IdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now(), pageable);
+                    break;
+                case FUTURE:
+                    bookings = bookingRepository.findAllByBooker_IdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now(), pageable);
+                    break;
+                case WAITING:
+                    bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.WAITING, pageable);
+                    break;
+                case REJECTED:
+                    bookings = bookingRepository.findAllByBooker_IdAndBookingStatusOrderByStartDesc(userId, BookingStatus.REJECTED, pageable);
+                    break;
+                default:
+                    throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
+            }
 
-        List<Booking> bookingList = bookings.getContent();
-        return mapper.toBookingTo(bookingList);
+            List<Booking> bookingList = bookings.getContent();
+            return mapper.toBookingTo(bookingList);
+        }
+        throw new BadRequestException("Что то пошло не так");
     }
 
 

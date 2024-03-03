@@ -3,8 +3,8 @@ package ru.practicum.shareit.request.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -42,26 +42,27 @@ public class ItemRequestServerImpl implements ItemRequestServer {
         User user = getUser(userId);
 
         List<ItemRequestDto> requests = mapper.toItemRequestDto(repository.findAllByRequesterOrderByCreatedAsc(user));
-        requests.forEach(requestDto -> requestDto.setItems(findAllByRequest(requestDto.getId())));
+        requests.forEach(requestDto -> requestDto.setItems(findAllByRequest(getItemRequest(requestDto.getId()))));
         return requests;
     }
 
     @Override
     public List<ItemRequestDto> getAllByUser(int from, int size, long userId) {
-        User user = getUser(userId);
-        Pageable pageable = PageRequest.of(from, size);
-        Page<ItemRequest> itemRequests = repository.findAllByRequesterOrderByCreatedAsc(user, pageable);
-        List<ItemRequest> requests = itemRequests.getContent();
-
-
-        return mapper.toItemRequestDto(requests);
+        checkUser(userId);
+        if (from >= 0) {
+            Page<ItemRequest> itemRequests = repository.findAllByRequester_IdNotOrderByCreatedDesc(userId, PageRequest.of(from / size, size));
+            List<ItemRequestDto> requests = mapper.toItemRequestDto(itemRequests.getContent());
+            requests.forEach(requestDto -> requestDto.setItems(findAllByRequest(getItemRequest(requestDto.getId()))));
+            return requests;
+        }
+        throw new BadRequestException("Что то пошло не так");
     }
 
     @Override
     public ItemRequestDto getById(Long userId, Long requestId) {
         checkUser(userId);
         ItemRequestDto itemRequestDto = mapper.fromItemRequestDto(getItemRequest(requestId));
-        itemRequestDto.setItems(findAllByRequest(requestId));
+        itemRequestDto.setItems(findAllByRequest(getItemRequest(requestId)));
         return itemRequestDto;
     }
 
@@ -81,7 +82,7 @@ public class ItemRequestServerImpl implements ItemRequestServer {
                 .orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
     }
 
-    private List<ItemDto> findAllByRequest(Long requestId) {
-        return itemMapper.toItemDos(itemRepository.findAllByRequestId(requestId));
+    private List<ItemDto> findAllByRequest(ItemRequest request) {
+        return itemMapper.toItemDos(itemRepository.findAllByRequest(request));
     }
 }

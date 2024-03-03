@@ -26,7 +26,7 @@ public class ItemRequestDto {
     @NotEmpty
     private String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime created;
+    private LocalDateTime created = LocalDateTime.now();
     private User requester;
     private List<ItemDto> items;
 }
