@@ -49,7 +49,7 @@ public class BookingServiceImpl implements BookingService {
             throw new EntityNotFoundException("Вы не можете бронировать свою вещь");
         }
 
-        Booking booking = mapper.toBookerTo(bookingRequestDto, booker, item, BookingStatus.WAITING);
+        Booking booking = mapper.fromBookingToItem(bookingRequestDto, booker, item, BookingStatus.WAITING);
 
         return mapper.fromBooking(bookingRepository.save(booking));
     }

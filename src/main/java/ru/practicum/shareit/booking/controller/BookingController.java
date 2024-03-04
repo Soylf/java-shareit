@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -48,6 +49,7 @@ public class BookingController {
     }
 
     @GetMapping
+    @Validated
     public List<BookingDto> getAllUser(@RequestHeader("X-Sharer-User-Id") long userId,
                                        @RequestParam(defaultValue = "ALL") String state,
                                        @RequestParam(defaultValue = "0") @Min(0) int from,
@@ -57,6 +59,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
+    @Validated
     public List<BookingDto> getAllOwner(@RequestHeader("X-Sharer-User-Id") long userId,
                                         @RequestParam(defaultValue = "ALL") String state,
                                         @RequestParam(defaultValue = "0") @Min(0) int from,

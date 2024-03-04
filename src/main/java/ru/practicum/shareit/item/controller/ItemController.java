@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -55,6 +56,7 @@ public class ItemController {
     }
 
     @GetMapping
+    @Validated
     public List<ItemDto> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                     @RequestParam(defaultValue = "0") @Min(0) int from,
                                     @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
@@ -63,6 +65,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
+    @Validated
     public List<ItemDto> searchItem(@RequestParam("text") String text,
                                     @RequestParam(defaultValue = "0") @Min(0) int from,
                                     @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {

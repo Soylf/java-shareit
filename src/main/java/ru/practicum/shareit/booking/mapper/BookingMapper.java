@@ -43,7 +43,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public Booking toBookerTo(BookingRequestDto bookingRequestDto, User booker, Item item, BookingStatus bookingStatus) {
+    public Booking fromBookingToItem(BookingRequestDto bookingRequestDto, User booker, Item item, BookingStatus bookingStatus) {
         return Booking.builder()
                 .bookingStatus(bookingStatus)
                 .booker(booker)

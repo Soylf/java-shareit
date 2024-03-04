@@ -1,15 +1,20 @@
 package ru.practicum.shareit.request;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
+import ru.practicum.shareit.request.service.ItemRequestServer;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -48,5 +53,13 @@ public class ItemRequestRepositoryTest {
                 .build();
 
         entityManager.persist(itemRequest1);
+    }
+
+    @Test
+    void findAllByRequesterIdOrderByCreated() {
+        List<ItemRequest> requests = itemRequestRepository.findAllByRequesterId(1L);
+
+        assertEquals(requests.size(), 1);
+        assertEquals(requests.get(0).getDescription(), "request description");
     }
 }
