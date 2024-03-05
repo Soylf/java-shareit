@@ -12,17 +12,22 @@ import java.util.List;
 @NoArgsConstructor
 public class ApiError {
 
+    private String error;
     private String message;
-    private String debugMessage;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<String> errors;
 
-    public ApiError(String message, String debugMessage) {
+    public ApiError(String message, String error) {
+        this.error = error;
         this.message = message;
-        this.debugMessage = debugMessage;
     }
 
     public ApiError(String message) {
+        this.message = message;
+    }
+
+    public ApiError(String message, StackTraceElement[] stackTrace) {
+        this.message = message;
     }
 }
