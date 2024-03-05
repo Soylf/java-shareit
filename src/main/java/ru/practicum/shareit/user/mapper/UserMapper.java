@@ -1,12 +1,13 @@
 package ru.practicum.shareit.user.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
-@RequiredArgsConstructor
 public class UserMapper {
     public User fromDto(UserDto userDto) {
         return new User(
@@ -24,4 +25,9 @@ public class UserMapper {
         );
     }
 
+    public List<UserDto> toUserDto(List<User> users) {
+        return users.stream()
+                .map(this::fromUser)
+                .collect(Collectors.toList());
+    }
 }

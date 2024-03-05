@@ -1,13 +1,16 @@
 package ru.practicum.shareit.item.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
+import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -15,20 +18,19 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @Builder
-@NonNull
 public class ItemDto {
     private Long id;
-
-    @NotNull(message = "userId не может быть пустым")
-    private Long userId;
-
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private User owner;
     @NotBlank(message = "Неверное название")
     private String name;
-
-    @NotBlank(message = "Неверное описание")
+    @NotBlank
+    @Size(max = 512, message = "Описание не должно превышать 512 символов")
     private String description;
-
     @NotNull(message = "available не может быть пустым")
     private Boolean available;
-    private Integer numTimes;
+    private BookingResponseDto lastBooking;
+    private BookingResponseDto nextBooking;
+    private List<CommentResponseDto> comments;
+    private Long requestId;
 }
