@@ -2,14 +2,10 @@ package ru.practicum.shareit.request.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestServer;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
@@ -28,7 +24,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ItemRequestDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                 @Valid @RequestBody ItemRequestDto itemRequestDto) {
+                                 @RequestBody ItemRequestDto itemRequestDto) {
         log.info("Получен запрос на создание публикации " + itemRequestDto + " от " + userId);
         return server.create(userId, itemRequestDto);
     }
@@ -40,11 +36,10 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    @Validated
     public List<ItemRequestDto> getAllItemRequestDtoByUser(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestParam(defaultValue = "0") @Min(0) int from,
-            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size) {
         log.info("Поулчен запрос на получение списка публикация от других пользовтелей: вот некотоыре данные \n"
                 + " Пользователь " + userId + "\n Начало списка " + from + "\n Конец списка " + size);
         return server.getAllByUser(from, size, userId);

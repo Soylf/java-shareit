@@ -12,5 +12,4 @@ import javax.validation.constraints.NotEmpty;
 public class ItemRequestPostDto {
     @NotEmpty(message = "Описание не должно быть пустым")
     private String description;
-
 }

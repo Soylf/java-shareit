@@ -2,15 +2,11 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
@@ -28,15 +24,16 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@Valid @RequestBody ItemDto itemDto,
+    public ItemDto createItem(@RequestBody ItemDto itemDto,
                               @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получен запрос на добавление пользователя : {}.", itemDto);
         return service.addItem(itemDto, userId);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentResponseDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId,
-                                         @Valid @RequestBody CommentResponseDto commentDto) {
+    public CommentResponseDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                         @PathVariable Long itemId,
+                                         @RequestBody CommentResponseDto commentDto) {
         log.info("Получен запрос на создания комита к придмета под номером " + itemId + " от " + userId + " с таким вот содержанием {}", commentDto);
         return service.addComment(commentDto, itemId, userId);
     }
@@ -50,25 +47,24 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ItemDto getItem(@PathVariable Long itemId,
+                           @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получен запрос на поулчение обьекта под номер " + itemId + " от " + userId);
         return service.getItem(itemId, userId).orElse(null);
     }
 
     @GetMapping
-    @Validated
     public List<ItemDto> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                    @RequestParam(defaultValue = "0") @Min(0) int from,
-                                    @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
+                                    @RequestParam(defaultValue = "0") int from,
+                                    @RequestParam(defaultValue = "10") int size) {
         log.info("Получен запрос на поулчение всех придметов у пользовтаеля " + userId);
         return service.getAllItem(userId, from, size);
     }
 
     @GetMapping("/search")
-    @Validated
     public List<ItemDto> searchItem(@RequestParam("text") String text,
-                                    @RequestParam(defaultValue = "0") @Min(0) int from,
-                                    @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
+                                    @RequestParam(defaultValue = "0") int from,
+                                    @RequestParam(defaultValue = "10") int size) {
         log.info("Получен запрос на поиск придмета: " + text);
         return service.searchItem(text, from, size);
     }
