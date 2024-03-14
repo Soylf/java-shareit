@@ -14,12 +14,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
-@Controller
-@RequestMapping(path = "/items")
+@RestController
+@RequestMapping("/items")
 @RequiredArgsConstructor
-@Slf4j
 @Validated
-public class itemController {
+@Slf4j
+public class ItemController {
     private final ItemClient client;
 
     @PostMapping
