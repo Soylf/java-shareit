@@ -53,6 +53,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         System.out.println(Arrays.toString(e.getStackTrace()));
         return new ApiError("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleThrowable(final ValidationException e) {
