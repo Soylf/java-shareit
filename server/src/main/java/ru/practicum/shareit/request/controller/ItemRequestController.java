@@ -1,7 +1,7 @@
 package ru.practicum.shareit.request.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestServer;
@@ -13,14 +13,11 @@ import java.util.List;
  */
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
     private final ItemRequestServer server;
 
-    @Autowired
-    public ItemRequestController(ItemRequestServer server) {
-        this.server = server;
-    }
 
     @PostMapping
     public ItemRequestDto create(@RequestHeader("X-Sharer-User-Id") Long userId,

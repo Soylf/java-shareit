@@ -23,45 +23,34 @@ public class itemController {
     private final ItemClient client;
 
     @PostMapping
-    public ResponseEntity<Object> addItem(@Valid @RequestBody ItemDto itemDto,
-                                          @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Object> addItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
         return client.addItem(itemDto, userId);
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                             @PathVariable Long itemId,
-                                             @Valid @RequestBody CommentRequestDto commentDto) {
+    public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId, @Valid @RequestBody CommentRequestDto commentDto) {
         return client.addComment(userId, itemId, commentDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<Object> update(@RequestBody ItemDto itemDto,
-                                         @PathVariable("itemId") Long itemId,
-                                         @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Object> update(@RequestBody ItemDto itemDto, @PathVariable("itemId") Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
         checkValidItemForUpdate(itemDto);
         return client.update(itemDto, itemId, userId);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<Object> getItem(@PathVariable Long itemId,
-                                          @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Object> getItem(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
         return client.getItem(itemId, userId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                           @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                           @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+    public ResponseEntity<Object> getItems(@RequestHeader("X-Sharer-User-Id") Long userId, @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from, @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return client.getItems(userId, from, size);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> searchItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                             @RequestParam("text") String text,
-                                             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        return client.searchItem(userId ,text, from, size);
+    public ResponseEntity<Object> searchItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam("text") String text, @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from, @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return client.searchItem(userId, text, from, size);
     }
 
 
