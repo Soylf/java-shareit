@@ -13,6 +13,10 @@
 
 	<name>ShareIt Server</name>
 
+	<properties>
+		<java.version>11</java.version>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -33,7 +37,6 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
-
 		</dependency>
 
 		<dependency>
@@ -59,10 +62,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>jakarta.validation</groupId>
-			<artifactId>jakarta.validation-api</artifactId>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -87,9 +86,5 @@
 			</build>
 		</profile>
 	</profiles>
-
-	<properties>
-		<maven.test.skip>true</maven.test.skip>
-	</properties>
 
 </project>

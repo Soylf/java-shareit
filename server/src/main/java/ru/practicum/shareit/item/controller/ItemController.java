@@ -24,7 +24,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestBody ItemDto itemDto,
+    public ItemDto addItem(@RequestBody ItemDto itemDto,
                               @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получен запрос на добавление пользователя : {}.", itemDto);
         return service.addItem(itemDto, userId);
@@ -54,7 +54,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") Long userId,
                                     @RequestParam(defaultValue = "0") int from,
                                     @RequestParam(defaultValue = "10") int size) {
         log.info("Получен запрос на поулчение всех придметов у пользовтаеля " + userId);
