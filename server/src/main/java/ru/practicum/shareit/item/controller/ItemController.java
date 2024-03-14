@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentResponseDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -14,18 +14,14 @@ import java.util.List;
  */
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService service;
 
-    @Autowired
-    public ItemController(ItemService service) {
-        this.service = service;
-    }
-
     @PostMapping
     public ItemDto addItem(@RequestBody ItemDto itemDto,
-                              @RequestHeader("X-Sharer-User-Id") Long userId) {
+                           @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Получен запрос на добавление пользователя : {}.", itemDto);
         return service.addItem(itemDto, userId);
     }
@@ -55,8 +51,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                    @RequestParam(defaultValue = "0") int from,
-                                    @RequestParam(defaultValue = "10") int size) {
+                                  @RequestParam(defaultValue = "0") int from,
+                                  @RequestParam(defaultValue = "10") int size) {
         log.info("Получен запрос на поулчение всех придметов у пользовтаеля " + userId);
         return service.getAllItem(userId, from, size);
     }
