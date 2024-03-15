@@ -7,8 +7,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.Valid;
-
 @Controller
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -17,12 +15,12 @@ public class UserController {
     private final UserClient client;
 
     @PostMapping
-    public ResponseEntity<Object> create(@Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<Object> create(@RequestBody UserDto userDto) {
         return client.add(userDto);
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<Object> update(@Valid @RequestBody UserDto userDto,
+    public ResponseEntity<Object> update(@RequestBody UserDto userDto,
                                          @PathVariable("userId") Long id) {
         return client.update(id, userDto);
     }
