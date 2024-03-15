@@ -3,7 +3,7 @@ services:
   gateway:
     build: gateway
     image: java-shareit-gateway
-    container_name: gateway-container
+    container_name: shareit-gateway
     ports:
       - "8080:8080"
     depends_on:
@@ -14,7 +14,7 @@ services:
   server:
     build: server
     image: java-shareit-server
-    container_name: server-container
+    container_name: shareit-server
     ports:
       - "9090:9090"
       - "8081:8081"
