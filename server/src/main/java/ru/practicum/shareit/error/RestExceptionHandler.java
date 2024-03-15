@@ -50,7 +50,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ApiError handleNoEnumValueArgumentException(final NoEnumValueArgumentException e) {
         log.error("Unknown state: UNSUPPORTED_STATUS, {}", e.getMessage());
-        System.out.println(Arrays.toString(e.getStackTrace()));
         return new ApiError("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
     }
 

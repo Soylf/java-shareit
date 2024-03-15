@@ -23,28 +23,36 @@ public class ItemController {
     private final ItemClient client;
 
     @PostMapping
-    public ResponseEntity<Object> addItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Object> addItem(@Valid @RequestBody ItemDto itemDto,
+                                          @RequestHeader("X-Sharer-User-Id") Long userId) {
         return client.addItem(itemDto, userId);
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId, @Valid @RequestBody CommentRequestDto commentDto) {
+    public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                             @PathVariable Long itemId,
+                                             @Valid @RequestBody CommentRequestDto commentDto) {
         return client.addComment(userId, itemId, commentDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<Object> update(@RequestBody ItemDto itemDto, @PathVariable("itemId") Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
-        checkValidItemForUpdate(itemDto);
+    public ResponseEntity<Object> update(@RequestBody ItemDto itemDto,
+                                         @PathVariable("itemId") Long itemId,
+                                         @RequestHeader("X-Sharer-User-Id") Long userId) {
+        checkItem(itemDto);
         return client.update(itemDto, itemId, userId);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<Object> getItem(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Object> getItem(@PathVariable Long itemId,
+                                          @RequestHeader("X-Sharer-User-Id") Long userId) {
         return client.getItem(itemId, userId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getItems(@RequestHeader("X-Sharer-User-Id") Long userId, @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from, @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+    public ResponseEntity<Object> getItems(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                           @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                           @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         return client.getItems(userId, from, size);
     }
 
@@ -54,7 +62,7 @@ public class ItemController {
     }
 
 
-    private void checkValidItemForUpdate(ItemDto item) {
+    private void checkItem(ItemDto item) {
         if (item.getName() != null) {
             if (item.getName().isBlank()) {
                 throw new BadRequestException("Name");

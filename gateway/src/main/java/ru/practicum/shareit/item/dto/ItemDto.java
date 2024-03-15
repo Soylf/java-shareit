@@ -15,12 +15,9 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemDto {
-    @Positive(message = "Item id должен быть положительным")
-    private Long id;
-    @NotBlank(message = "Наименование не должно быть пустым")
+    @NotBlank
     private String name;
     @NotBlank
-    @Size(max = 512, message = "Описание не должно превышать 512 символов")
     private String description;
     @NotNull
     private Boolean available;

@@ -2,7 +2,7 @@ package ru.practicum.shareit.request.dto;
 
 import lombok.*;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
@@ -10,6 +10,6 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 @Builder
 public class ItemRequestPostDto {
-    @NotEmpty(message = "Описание не должно быть пустым")
+    @NotBlank
     private String description;
 }

@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.server.BookingService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public class BookingController {
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto updateStatus(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long bookingId,
+    public BookingDto setApprove(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long bookingId,
                                    @RequestParam(name = "approved", required = false) Boolean approved) {
         log.info("Полчен запрос на обновление бронирования от " + userId + " на бронь  {}", bookingId);
         return service.updateStatus(userId, bookingId, approved);

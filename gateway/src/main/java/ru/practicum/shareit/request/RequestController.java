@@ -15,7 +15,6 @@ import javax.validation.constraints.PositiveOrZero;
 @Controller
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
-@Slf4j
 @Validated
 public class RequestController {
     private final RequestClient client;
@@ -39,7 +38,7 @@ public class RequestController {
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity<Object> getRequest(@PathVariable Long requestId,
+    public ResponseEntity<Object> getRequest(@Positive @PathVariable Long requestId,
                                              @RequestHeader("X-Sharer-User-Id") Long userId) {
         return client.getRequest(requestId, userId);
     }
