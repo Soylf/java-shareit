@@ -1,4 +1,4 @@
-package ru.practicum.shareit.error.exception;
+package ru.practicum.shareit.error;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

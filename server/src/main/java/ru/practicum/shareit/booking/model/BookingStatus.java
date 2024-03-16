@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.model;
 
-import ru.practicum.shareit.error.exception.NoEnumValueArgumentException;
+import ru.practicum.shareit.error.exception.BadRequestException;
 
 public enum BookingStatus {
     ALL,
@@ -16,7 +16,7 @@ public enum BookingStatus {
         try {
             bookingStatus = valueOf(state.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new NoEnumValueArgumentException("Что-то пошло не так");
+            throw new BadRequestException("Что-то пошло не так");
         }
         return bookingStatus;
     }

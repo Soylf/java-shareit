@@ -13,7 +13,6 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.error.exception.BadRequestException;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
-import ru.practicum.shareit.error.exception.NoEnumValueArgumentException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -90,7 +89,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAllOwner(long ownerId, String state, int from, int size) {
         checkUser(ownerId);
-        checkState(state);
 
         if (from >= 0) {
             Pageable pageable = PageRequest.of(from / size, size);
@@ -126,7 +124,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAllUser(long userId, String state, int from, int size) {
         checkUser(userId);
-        checkState(state);
 
         if (from >= 0) {
             Pageable pageable = PageRequest.of(from / size, size);
@@ -166,15 +163,6 @@ public class BookingServiceImpl implements BookingService {
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));
     }
 
-    private void checkState(String state) {
-        BookingStatus[] values = BookingStatus.values();
-        for (BookingStatus val : values) {
-            if (state.equals(val.name())) {
-                return;
-            }
-        }
-        throw new NoEnumValueArgumentException(("Unknown state: " + state));
-    }
 
     private User getUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("пользователя: " + userId + "  нет"));

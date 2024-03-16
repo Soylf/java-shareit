@@ -15,7 +15,6 @@ import javax.validation.constraints.PositiveOrZero;
 @Controller
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
-
 @Validated
 public class BookingController {
     private final BookingClient bookingClient;
@@ -27,7 +26,7 @@ public class BookingController {
                                               @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
 
         BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
+                .orElseThrow(() -> new IllegalStateException("Unknown state: " + stateParam));
         return bookingClient.getBookings(userId, state, from, size);
     }
 
@@ -37,7 +36,7 @@ public class BookingController {
                                               @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                               @Positive @RequestParam(defaultValue = "10") int size) {
         BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
+                .orElseThrow(() -> new IllegalStateException("Unknown state: " + stateParam));
         return bookingClient.getBookingsForOwner(userId, state, from, size);
     }
 

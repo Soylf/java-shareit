@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ru.practicum.shareit.error.exception.*;
+import ru.practicum.shareit.error.exception.BadRequestException;
+import ru.practicum.shareit.error.exception.ConflictException;
+import ru.practicum.shareit.error.exception.EntityNotFoundException;
+import ru.practicum.shareit.error.exception.ErrorResponse;
 
 import java.util.Arrays;
 
@@ -44,13 +47,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.info("409 {}", e.getMessage());
         System.out.println(Arrays.toString(e.getStackTrace()));
         return new ApiError(e.getMessage(), e.getStackTrace());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ApiError handleNoEnumValueArgumentException(final NoEnumValueArgumentException e) {
-        log.error("Unknown state: UNSUPPORTED_STATUS, {}", e.getMessage());
-        return new ApiError("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
     }
 
     @ExceptionHandler
