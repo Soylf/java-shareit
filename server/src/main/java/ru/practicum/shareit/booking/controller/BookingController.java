@@ -29,7 +29,7 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     public BookingDto setApprove(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long bookingId,
-                                 @RequestParam(name = "approved", required = false) Boolean approved) {
+                                 @RequestParam(name = "approved") Boolean approved) {
         log.info("Полчен запрос на обновление бронирования от " + userId + " на бронь  {}", bookingId);
         return service.updateStatus(userId, bookingId, approved);
     }
